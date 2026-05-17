@@ -4,7 +4,8 @@
   "description": "An interactive NFT sliding puzzle game.",
   "main": "script.js",
   "scripts": {
-    "start": "npx -y serve ."
+    "start": "npx -y serve .",
+    "build": "echo 'Building static site'"
   },
   "keywords": [
     "nft",
