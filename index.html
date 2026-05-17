@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE BEAKS | NFT Art Puzzle</title>
+    <meta name="description"
+        content="Solve the puzzle to reveal rare NFT artwork by Dima Kashtalyan and the Beaks community.">
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Playfair+Display:wght@700;900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!--  Phase 0: Book Flip Intro                   -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="book-flip-screen" class="screen">
+        <!-- Tap-to-start overlay (satisfies browser AudioContext gesture requirement) -->
+        <div class="tap-start" id="tap-start">
+            <div class="tap-hint">TAP ANYWHERE TO BEGIN</div>
+        </div>
+        <div class="flip-stage">
+            <div class="flip-book" id="flip-book">
+                <div class="flip-page" id="page-0"><img src="assets/1st collection.jpg" alt="The Beaks 1st Collection">
+                </div>
+                <div class="flip-page" id="page-1"><img src="assets/2nd collection.jpg" alt="The Beaks 2nd Collection">
+                </div>
+                <div class="flip-page" id="page-2"><img src="assets/3rd collection.jpg" alt="The Beaks 3rd Collection">
+                </div>
+                <div class="flip-page" id="page-3"><img src="assets/yo.jpg" alt="Beaks NFT 1"></div>
+                <div class="flip-page" id="page-4"><img src="assets/miss ayo.jpg" alt="Beaks NFT 2"></div>
+                <div class="flip-page" id="page-5"><img src="assets/IAMJAY.jpg" alt="Beaks NFT 3"></div>
+                <div class="flip-page flip-cover" id="page-6">
+                    <!--<div class="cover-text">
+                        <h2>THE BEAKS</h2>
+                        <p>by Dima Kashtalyan</p>
+                    </div>-->
+                </div>
+            </div>
+        </div>
+        <button id="skip-flip-btn" class="btn-skip">SKIP INTRO</button>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!--  Phase 1: Video Intro                       -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="video-screen" class="screen hidden">
+        <video id="intro-video" playsinline>
+            <source src="assets/intro video.mp4" type="video/mp4">
+        </video>
+        <button id="skip-video-btn" class="btn-skip">SKIP</button>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!--  Phase 2: Landing / Home                    -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="intro-screen" class="screen hidden">
+        <div class="landing-wrap">
+            <div class="landing-hero">
+                <div class="hero-ring">
+                    <img src="assets/1st collection.jpg" alt="The Beaks 1st Collection" class="hero-slide active">
+                    <img src="assets/2nd collection.jpg" alt="The Beaks 2nd Collection" class="hero-slide">
+                    <img src="assets/3rd collection.jpg" alt="The Beaks 3rd Collection" class="hero-slide">
+                </div>
+            </div>
+            <div class="landing-copy">
+                <h1 class="brand-title">THE BEAKS</h1>
+                <p class="brand-subtitle">by <span class="brand-founder">Dima Kashtalyan</span></p>
+                <p class="brand-desc">
+                    A genesis collection of 1,111 surreal characters forged in stippling &amp; pointillism. Each piece a
+                    world. Each puzzle a key.
+                </p>
+                <button id="start-btn" class="btn-primary">ENTER ART STUDIO</button>
+            </div>
+        </div>
+        <footer class="site-footer">Created by ExpatQ3</footer>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!--  Phase 3: Art Selection / Setup             -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="setup-screen" class="screen hidden scrollable">
+        <div class="setup-inner">
+            <h2 class="page-title">SELECT YOUR CANVAS</h2>
+
+            <div class="setup-layout">
+
+                <!-- Gallery -->
+                <div class="setup-panel panel-gallery">
+                    <div class="panel-head">
+                        <h3>THE BEAKS GALLERY</h3>
+                        <p>Pick a piece to authenticate</p>
+                    </div>
+                    <div class="gallery-grid" id="gallery-container">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Sidebar: Selected + Upload -->
+                <div class="setup-panel panel-sidebar">
+                    <button id="back-to-gallery-btn" class="btn-back-mobile">&larr; BACK TO GALLERY</button>
+                    <div class="panel-head">
+                        <h3>SELECTED ART</h3>
+                        <p id="selection-status">Choose from gallery or upload below</p>
+                    </div>
+
+                    <div class="selected-preview-box" id="preview-box">
+                        <img id="setup-preview-img" src="" alt="Selected Art Preview" class="hidden">
+                        <span class="preview-placeholder" id="preview-placeholder">No art selected</span>
+                    </div>
+
+                    <p id="artist-display" class="artist-badge hidden">
+                        🎨 <span id="artist-name-val"></span>
+                    </p>
+
+                    <div class="upload-section">
+                        <label for="image-upload" class="upload-zone" id="drop-zone">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="16 16 12 12 8 16" />
+                                <line x1="12" y1="12" x2="12" y2="21" />
+                                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+                            </svg>
+                            <span id="upload-label">Upload Your Own Art</span>
+                            <input type="file" id="image-upload" accept="image/*">
+                        </label>
+                    </div>
+
+                    <button id="launch-game-btn" class="btn-primary launch-btn" disabled>
+                        LAUNCH MISSION
+                    </button>
+                </div>
+
+            </div>
+        </div>
+        <footer class="site-footer">Created by ExpatQ3</footer>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!--  Phase 4: Game                              -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="game-screen" class="screen hidden scrollable">
+        <div class="game-inner">
+            <header class="game-header">
+                <h1 class="game-title">ART AUTHENTICATION</h1>
+                <p class="game-artist">Artwork by <span id="game-artist-name"></span></p>
+                <div class="timer-pill">
+                    <span class="timer-label">TIME LEFT</span>
+                    <span id="timer">03:00</span>
+                </div>
+            </header>
+
+            <!-- Game Body: Puzzle left, Target right on desktop -->
+            <div class="game-body">
+                <!-- Puzzle Area -->
+                <div class="puzzle-area">
+                    <div class="puzzle-wrap">
+                        <div id="puzzle-board" class="puzzle-grid"></div>
+                    </div>
+                </div>
+
+                <!-- Target NFT (right side on desktop) -->
+                <div class="target-card target-side">
+                    <h4>TARGET ART</h4>
+                    <img id="target-preview" src="" alt="Target Preview">
+                </div>
+            </div>
+
+            <!-- Controls below game body -->
+            <div class="game-controls-row">
+                <button id="toggle-numbers-btn" class="btn-secondary">SHOW NUMBERS</button>
+                <button id="shuffle-btn" class="btn-secondary">SHUFFLE</button>
+                <button id="ai-bot-btn" class="btn-secondary">AI ASSIST</button>
+            </div>
+        </div>
+        <footer class="site-footer">Created by ExpatQ3</footer>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!--  Phase 5: Completion                        -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="message" class="overlay-screen hidden">
+        <div class="overlay-content">
+            <div class="overlay-icon" id="overlay-icon">✓</div>
+            <h1 id="status-title">AUTHENTICATED</h1>
+            <p id="status-text"></p>
+            <div class="overlay-art-preview">
+                <img id="overlay-art-img" src="" alt="Completed Art">
+            </div>
+            <div class="overlay-actions">
+                <button id="replay-btn" class="btn-secondary">REPLAY</button>
+                <button id="share-x-btn" class="btn-primary share-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                    SHARE TO X
+                </button>
+            </div>
+        </div>
+        <!-- Hidden canvas for generating share card -->
+        <canvas id="share-canvas" style="display:none;"></canvas>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

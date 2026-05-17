@@ -1,0 +1,17 @@
+{
+  "name": "nft-puzzle-game",
+  "version": "1.0.0",
+  "description": "An interactive NFT sliding puzzle game.",
+  "main": "script.js",
+  "scripts": {
+    "start": "npx -y serve ."
+  },
+  "keywords": [
+    "nft",
+    "puzzle",
+    "game",
+    "web3"
+  ],
+  "author": "",
+  "license": "ISC"
+}
