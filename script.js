@@ -596,7 +596,8 @@ $('share-x-btn').onclick = async () => {
     const elapsed = 180 - secondsLeft;
     const m = Math.floor(elapsed/60).toString().padStart(2,'0');
     const s = (elapsed % 60).toString().padStart(2,'0');
-    const tweetText = `I just authenticated ${selectedArtist}'s Beaks NFT artwork in ${m}:${s}! 🎨\n\nPlay here: https://thebeaks-puzzle.vercel.app/\n\n@DKashtalyan @thebeaksart @ssheyii @MartKAD\n\n#TheBeaks #NFT #PuzzleChallenge`;
+    const tweetText = `**art authentication complete** 🔻\n\nreconstructed ${selectedArtist}'s pointillism masterpiece in exactly ${m}:${s} against the clock.\n\nno cheats. just raw stipples.\n\nbeat my time here: https://thebeaks-puzzle.vercel.app/\n\n@DKashtalyan @thebeaksart @ssheyii @MartKAD 🧩\n\nhttps://x.com/ExpatQ3/status/2056048595199987823?s=20`;
+
 
     let imageCopied = false;
     try {
