@@ -597,6 +597,15 @@ button { cursor:pointer; font-family:inherit; }
 }
 
 .tile:hover { filter: brightness(1.25); transform: scale(1.02); z-index: 2; }
+.tile.movable {
+    box-shadow: inset 0 0 0 1px rgba(232, 193, 106, 0.3);
+}
+.tile.movable:hover {
+    box-shadow: inset 0 0 0 2px var(--gold);
+    filter: brightness(1.3);
+    transform: scale(1.03);
+    z-index: 3;
+}
 
 .empty-slot {
     background: rgba(255,255,255,0.03) !important;
@@ -854,3 +863,55 @@ button { cursor:pointer; font-family:inherit; }
         max-width: min(100%, calc(100vh - 380px));
     }
 }
+
+/* ──────────────────────────────────────────────────────
+   DIFFICULTY OPTIONS
+   ────────────────────────────────────────────────────── */
+.difficulty-section {
+    width: 100%;
+    margin: 1.2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.difficulty-section h4 {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+
+.difficulty-options {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.diff-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.6rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.05em;
+}
+
+.diff-btn:hover {
+    border-color: rgba(232, 193, 106, 0.4);
+    color: var(--white);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.diff-btn.active {
+    background: rgba(232, 193, 106, 0.1);
+    border-color: var(--gold);
+    color: var(--gold);
+    box-shadow: 0 0 15px rgba(232, 193, 106, 0.15);
+}
+

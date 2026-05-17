@@ -11,11 +11,11 @@
 let selectedImg     = null;
 let selectedArtist  = '';
 let tiles           = [];
-let emptyTileIndex  = 15;
+let gridSize        = 3; // Default size: 3 (3x3 - Easy) or 4 (4x4 - Challenge)
+let emptyTileIndex  = 8;
 let timerInterval   = null;
 let secondsLeft     = 180;
 let gameStarted     = false;
-let aiRunning       = false;
 let showNumbers     = false;
 
 // ──────────────────────────────────────────────────────
@@ -256,6 +256,15 @@ $('image-upload').addEventListener('change', e => {
     reader.readAsDataURL(file);
 });
 
+// Grid Difficulty Selection
+document.querySelectorAll('.diff-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        gridSize = parseInt(btn.dataset.grid);
+    });
+});
+
 dom.launchBtn.onclick = () => {
     if (!selectedImg) return;
     showScreen('game');
@@ -277,7 +286,7 @@ function getTileSize() {
         const puzzleWrap = document.querySelector('.puzzle-wrap');
         const containerWidth = puzzleWrap ? puzzleWrap.clientWidth : gameInner.clientWidth;
         const availWidth = containerWidth - 16 - 12; // padding + gaps
-        const computed = Math.floor(availWidth / 4);
+        const computed = Math.floor(availWidth / gridSize);
         if (computed > 20) return computed;
     }
     return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tile')) || 90;
@@ -287,18 +296,25 @@ function initPuzzle(src) {
     dom.board.innerHTML = '';
     tiles = [];
 
-    for (let i = 0; i < 16; i++) {
+    // Set grid columns dynamically on the board element
+    dom.board.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+    dom.board.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
+
+    const totalTiles = gridSize * gridSize;
+    const emptyIdx = totalTiles - 1;
+
+    for (let i = 0; i < totalTiles; i++) {
         const el = document.createElement('div');
         el.classList.add('tile');
-        const col = i % 4, row = Math.floor(i / 4);
+        const col = i % gridSize, row = Math.floor(i / gridSize);
 
-        if (i === 15) {
+        if (i === emptyIdx) {
             el.classList.add('empty-slot');
-            emptyTileIndex = 15;
+            emptyTileIndex = emptyIdx;
         } else {
             el.style.backgroundImage    = `url("${src}")`;
-            el.style.backgroundSize     = `400% 400%`;
-            el.style.backgroundPosition = `${(col / 3) * 100}% ${(row / 3) * 100}%`;
+            el.style.backgroundSize     = `${gridSize * 100}% ${gridSize * 100}%`;
+            el.style.backgroundPosition = `${(col / (gridSize - 1)) * 100}% ${(row / (gridSize - 1)) * 100}%`;
 
             // Number overlay
             const num = document.createElement('span');
@@ -317,8 +333,9 @@ function initPuzzle(src) {
 }
 
 function handleClick(t) {
-    if (aiRunning || !gameStarted) return;
-    if (t.originalIndex === 15) return;
+    if (!gameStarted) return;
+    const emptyIdx = (gridSize * gridSize) - 1;
+    if (t.originalIndex === emptyIdx) return;
     if (isAdj(t.currentIndex, emptyTileIndex)) {
         swap(t);
         checkWin();
@@ -326,16 +343,30 @@ function handleClick(t) {
 }
 
 function isAdj(a, b) {
-    return Math.abs(Math.floor(a/4) - Math.floor(b/4)) + Math.abs(a%4 - b%4) === 1;
+    return Math.abs(Math.floor(a/gridSize) - Math.floor(b/gridSize)) + Math.abs(a%gridSize - b%gridSize) === 1;
+}
+
+// Target helper highlight for adjacent tiles
+function updateMovableHighlights() {
+    const nbrs = getNeighbors(emptyTileIndex);
+    tiles.forEach(t => {
+        if (nbrs.includes(t.currentIndex) && t.originalIndex !== (gridSize * gridSize) - 1) {
+            t.el.classList.add('movable');
+        } else {
+            t.el.classList.remove('movable');
+        }
+    });
 }
 
 function swap(t) {
-    const empty = tiles.find(x => x.originalIndex === 15);
+    const emptyIdx = (gridSize * gridSize) - 1;
+    const empty = tiles.find(x => x.originalIndex === emptyIdx);
     const prev  = t.currentIndex;
     t.currentIndex    = emptyTileIndex;
     empty.currentIndex = prev;
     emptyTileIndex    = prev;
     renderBoard();
+    updateMovableHighlights();
 }
 
 function renderBoard() {
@@ -345,33 +376,37 @@ function renderBoard() {
 }
 
 function getNeighbors(idx) {
-    const r = Math.floor(idx/4), c = idx%4, n = [];
-    if (r > 0) n.push(idx-4);
-    if (r < 3) n.push(idx+4);
+    const r = Math.floor(idx/gridSize), c = idx%gridSize, n = [];
+    if (r > 0) n.push(idx-gridSize);
+    if (r < gridSize - 1) n.push(idx+gridSize);
     if (c > 0) n.push(idx-1);
-    if (c < 3) n.push(idx+1);
+    if (c < gridSize - 1) n.push(idx+1);
     return n;
 }
 
 function shuffleBoard() {
+    const emptyIdx = (gridSize * gridSize) - 1;
     tiles.forEach((t,i) => t.currentIndex = i);
-    emptyTileIndex = 15;
-    for (let i = 0; i < 240; i++) {
+    emptyTileIndex = emptyIdx;
+    const shuffleSteps = gridSize === 3 ? 120 : 240;
+    for (let i = 0; i < shuffleSteps; i++) {
         const nbrs = getNeighbors(emptyTileIndex);
         const pick = nbrs[Math.floor(Math.random() * nbrs.length)];
         const t    = tiles.find(x => x.currentIndex === pick);
-        const emp  = tiles.find(x => x.originalIndex === 15);
+        const emp  = tiles.find(x => x.originalIndex === emptyIdx);
         const tmp  = t.currentIndex;
         t.currentIndex   = emptyTileIndex;
         emp.currentIndex = tmp;
         emptyTileIndex   = tmp;
     }
     renderBoard();
+    updateMovableHighlights();
 }
 
 function checkWin() {
     if (gameStarted && tiles.every(t => t.originalIndex === t.currentIndex)) endGame(true);
 }
+
 
 // ──────────────────────────────────────────────────────
 //  Timer
@@ -591,32 +626,7 @@ dom.toggleNumBtn.addEventListener('click', () => {
     });
 });
 
-// AI Assist (teleport solve — visually animated)
-$('ai-bot-btn').addEventListener('click', async () => {
-    if (aiRunning) return;
-    aiRunning = true;
-    $('ai-bot-btn').textContent = 'SOLVING…';
-    $('ai-bot-btn').disabled = true;
 
-    for (let target = 0; target < 16; target++) {
-        const correct = tiles.find(t => t.originalIndex === target);
-        if (correct.currentIndex !== target) {
-            const occupant = tiles.find(t => t.currentIndex === target);
-            const oldPos   = correct.currentIndex;
-            correct.currentIndex  = target;
-            occupant.currentIndex = oldPos;
-            if (correct.originalIndex  === 15) emptyTileIndex = correct.currentIndex;
-            if (occupant.originalIndex === 15) emptyTileIndex = occupant.currentIndex;
-            renderBoard();
-            await new Promise(r => setTimeout(r, 55));
-        }
-    }
-
-    $('ai-bot-btn').textContent = 'AI ASSIST';
-    $('ai-bot-btn').disabled = false;
-    aiRunning = false;
-    checkWin();
-});
 
 // ──────────────────────────────────────────────────────
 //  Mobile: Back to Gallery button
