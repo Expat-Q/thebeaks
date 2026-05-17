@@ -49,6 +49,7 @@
     <!--  Phase 1: Video Intro                       -->
     <!-- ═══════════════════════════════════════════ -->
     <section id="video-screen" class="screen hidden">
+        <button id="back-to-flip-btn" class="btn-back-link btn-back-top">&larr; BACK</button>
         <video id="intro-video" playsinline>
             <source src="assets/intro video.mp4" type="video/mp4">
         </video>
@@ -59,6 +60,7 @@
     <!--  Phase 2: Landing / Home                    -->
     <!-- ═══════════════════════════════════════════ -->
     <section id="intro-screen" class="screen hidden">
+        <button id="back-to-video-btn" class="btn-back-link btn-back-top">&larr; BACK TO VIDEO</button>
         <div class="landing-wrap">
             <div class="landing-hero">
                 <div class="hero-ring">
@@ -85,7 +87,10 @@
     <!-- ═══════════════════════════════════════════ -->
     <section id="setup-screen" class="screen hidden scrollable">
         <div class="setup-inner">
-            <h2 class="page-title">SELECT YOUR CANVAS</h2>
+            <div class="setup-header-row">
+                <button id="back-to-home-btn" class="btn-back-link">&larr; BACK TO HOME</button>
+                <h2 class="page-title">SELECT YOUR CANVAS</h2>
+            </div>
 
             <div class="setup-layout">
 

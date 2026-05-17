@@ -193,6 +193,22 @@ dom.introVideo.muted = false;
 // ──────────────────────────────────────────────────────
 $('start-btn').onclick = () => showScreen('setup');
 
+// Back Buttons Navigation
+$('back-to-flip-btn').onclick = () => {
+    dom.introVideo.pause();
+    showScreen('flip');
+};
+
+$('back-to-video-btn').onclick = () => {
+    showScreen('video');
+    dom.introVideo.currentTime = 0;
+    dom.introVideo.play().catch(() => {});
+};
+
+$('back-to-home-btn').onclick = () => {
+    showScreen('intro');
+};
+
 // ──────────────────────────────────────────────────────
 //  Phase 3: Gallery
 // ──────────────────────────────────────────────────────

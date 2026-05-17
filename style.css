@@ -749,6 +749,65 @@ button { cursor:pointer; font-family:inherit; }
 .btn-secondary:disabled { opacity: 0.3; cursor: not-allowed; }
 .btn-secondary.active { background: var(--gold); color: #000; border-color: var(--gold); }
 
+/* Back Button & Header System */
+.btn-back-link {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: var(--trans);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-back-link:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(232, 193, 106, 0.15);
+}
+
+.btn-back-top {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    z-index: 100;
+}
+
+.setup-header-row {
+    position: relative;
+    width: 100%;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.setup-header-row .btn-back-link {
+    position: absolute;
+    left: 0;
+}
+
+.setup-header-row .page-title {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .setup-header-row {
+        flex-direction: column-reverse;
+        gap: 0.8rem;
+        align-items: center;
+    }
+    .setup-header-row .btn-back-link {
+        position: static;
+    }
+}
+
 /* ═══════════════════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════════════════ */
