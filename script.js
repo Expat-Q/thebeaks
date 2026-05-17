@@ -329,6 +329,15 @@ function initPuzzle(src) {
         tiles.push(tileObj);
         dom.board.appendChild(el);
     }
+    showNumbers = false;
+    dom.toggleNumBtn.classList.remove('active');
+    if (gridSize === 3) {
+        dom.toggleNumBtn.disabled = true;
+        dom.toggleNumBtn.textContent = 'SHOW NUMBERS (LOCKED - 90s)';
+    } else {
+        dom.toggleNumBtn.disabled = false;
+        dom.toggleNumBtn.textContent = 'SHOW NUMBERS';
+    }
     gameStarted = true;
 }
 
@@ -423,6 +432,25 @@ function tick() {
     const s = (secondsLeft % 60).toString().padStart(2,'0');
     dom.timerDisplay.textContent = `${m}:${s}`;
     dom.timerDisplay.classList.toggle('danger', secondsLeft <= 30);
+
+    // 3x3 Dynamic Lifeline Mechanic: Show Number only available when time is half (<= 90s left out of 180s)
+    if (gridSize === 3) {
+        if (secondsLeft > 90) {
+            dom.toggleNumBtn.disabled = true;
+            dom.toggleNumBtn.textContent = `SHOW NUMBERS (LOCKED - ${secondsLeft - 90}s)`;
+        } else {
+            dom.toggleNumBtn.disabled = false;
+            if (!showNumbers) {
+                dom.toggleNumBtn.textContent = 'SHOW NUMBERS';
+            } else {
+                dom.toggleNumBtn.textContent = 'HIDE NUMBERS';
+            }
+        }
+    } else {
+        // 4x4: always unlocked
+        dom.toggleNumBtn.disabled = false;
+    }
+
     if (secondsLeft-- <= 0) { clearInterval(timerInterval); endGame(false); }
 }
 
