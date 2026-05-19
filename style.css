@@ -459,6 +459,7 @@ button { cursor:pointer; font-family:inherit; }
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(10, 10, 14, 0.6); /* Darken the map background slightly */
     z-index: 1;
+    pointer-events: none; /* Let clicks pass through to the nodes */
 }
 
 .map-container {
