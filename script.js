@@ -6,6 +6,48 @@
 'use strict';
 
 // ──────────────────────────────────────────────────────
+//  Supabase & Auth State
+// ──────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://zxpqltyjojxtltxoqlhg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4cHFsdHlqb2p4dGx0eG9xbGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNzMzODcsImV4cCI6MjA5NDc0OTM4N30.k_fWjuWXag0Poq1TVP4TNMBRAu1rBWhVZL2c1BQeBMA';
+
+// Initialize Supabase Client (from CDN)
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+let currentUser = null;
+
+// Attempt to get existing session
+if (supabase) {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+            currentUser = session.user;
+            updateAuthUI();
+        }
+    });
+
+    // Listen for auth state changes (e.g. returning from X login)
+    supabase.auth.onAuthStateChange((_event, session) => {
+        currentUser = session?.user || null;
+        updateAuthUI();
+    });
+}
+
+function updateAuthUI() {
+    const btn = document.getElementById('auth-x-btn');
+    if (!btn) return;
+    if (currentUser) {
+        // User's Twitter handle is usually in user_metadata.user_name or preferred_username
+        const handle = currentUser.user_metadata?.user_name || currentUser.user_metadata?.preferred_username || "Authenticated";
+        btn.innerHTML = `<span style="color: #2ecc71;">✓ @${handle}</span>`;
+        btn.classList.add('authenticated');
+    } else {
+        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg> CONNECT X`;
+        btn.classList.remove('authenticated');
+    }
+}
+
+// ──────────────────────────────────────────────────────
 //  State
 // ──────────────────────────────────────────────────────
 let selectedImg     = null;
@@ -19,48 +61,54 @@ let gameStarted     = false;
 let showNumbers     = false;
 
 // ──────────────────────────────────────────────────────
-//  Gallery Data  (AI-generated files excluded)
+//  Level Data & Lore (GTD System)
 // ──────────────────────────────────────────────────────
-const GALLERY = [
-    { name: 'Dima Kashtalyan',    file: 'assets/1st collection.jpg' },
-    { name: 'Dima Kashtalyan',    file: 'assets/2nd collection.jpg' },
-    { name: 'Dima Kashtalyan',    file: 'assets/3rd collection.jpg' },
-    { name: '@0x_Castar',         file: 'assets/@0x_Castar.jpeg'    },
-    { name: '@AVolcans',          file: 'assets/@AVolcans.jpg'       },
-    { name: '@Calopo_',           file: 'assets/@Calopo_.jpeg'       },
-    { name: '@MynddNFT',          file: 'assets/@MynddNFT.png'       },
-    { name: '@Natt_369_',         file: 'assets/@Natt_369_.gif'      },
-    { name: '@Pauline_Fathima',   file: 'assets/@Pauline_Fathima.jpg'},
-    { name: '@T0kenPrince',       file: 'assets/@T0kenPrince.jpeg'   },
-    { name: '@Uchenna603',        file: 'assets/@Uchenna603.jpeg'    },
-    { name: '@Yizzz_web3',        file: 'assets/@Yizzz_web3.jpg'     },
-    { name: '@batt004',           file: 'assets/@batt004.jpg'        },
-    { name: '@bitartixt',         file: 'assets/@bitartixt.jpeg'     },
-    { name: '@ccshark64',         file: 'assets/@ccshark64.webp'     },
-    { name: '@dejiiszn',          file: 'assets/@dejiiszn.png'       },
-    { name: '@dhirajleg',         file: 'assets/@dhirajleg.jpg'      },
-    { name: '@lucas950825',       file: 'assets/@lucas950825.jpg'    },
-    { name: '@mr_wayne_2',        file: 'assets/@mr_wayne_2.jpeg'    },
-    { name: '@valkiz_jr',         file: 'assets/@valkiz_jr.jpg'      },
-    { name: '@verah_tee',         file: 'assets/@verah_tee.jpg'      },
-    { name: 'ANYA MISAAKI',       file: 'assets/ANYA MISAAKI.jpg'    },
-    { name: 'AURORA',             file: 'assets/AURORA.jpg'          },
-    { name: 'Ashley',             file: 'assets/Ashley.jpg'          },
-    { name: 'CITYBOY',            file: 'assets/CITYBOY.jpg'         },
-    { name: 'DR TIM',             file: 'assets/DR TIM.jpg'          },
-    { name: 'IAMJAY',             file: 'assets/IAMJAY.jpg'          },
-    { name: 'IEATDED',            file: 'assets/IEATDED.jpg'         },
-    { name: 'JUST-ROB',           file: 'assets/JUST-ROB.jpg'        },
-    { name: 'Rafiki web3',        file: 'assets/Rafiki web3.jpg'     },
-    { name: 'VICTORX',            file: 'assets/VICTORX.jpg'         },
-    { name: 'collcool_sneh',      file: 'assets/collcool_sneh.jpg'   },
-    { name: 'dark_jesus',         file: 'assets/dark_jesus.jpg'      },
-    { name: 'erfan5427',          file: 'assets/erfan5427.jpeg'      },
-    { name: 'miss ayo',           file: 'assets/miss ayo.jpg'        },
-    { name: 'prateek',            file: 'assets/prateek.jpg'         },
-    { name: 'sharu DS',           file: 'assets/sharu DS.jpg'        },
-    { name: 'yo',                 file: 'assets/yo.jpg'              },
+const LEVELS = [
+    {
+        id: 1,
+        title: "LEVEL 1: THE AWAKENING",
+        gridSize: 3,
+        timeLimit: 180,
+        unlocked: true,
+        arts: [
+            { name: 'Dima Kashtalyan', file: 'assets/1st collection.jpg', lore: "Forged in the fiery stipples of creation, this beak emerged from the ash to lead the flock." },
+            { name: 'ANYA MISAAKI', file: 'assets/ANYA MISAAKI.jpg', lore: "A silent watcher from the digital canopy, preserving the ancient secrets of the ExpatQ3 realm." },
+            { name: 'AURORA', file: 'assets/AURORA.jpg', lore: "Born under the neon lights of the metaverse, Aurora guides lost players through the grid." },
+            { name: 'CITYBOY', file: 'assets/CITYBOY.jpg', lore: "A true native of the blockchain streets. The Cityboy never sleeps, constantly hunting for alpha." }
+        ]
+    },
+    {
+        id: 2,
+        title: "LEVEL 2: THE PILGRIMAGE",
+        gridSize: 4,
+        timeLimit: 180,
+        unlocked: false,
+        arts: [
+            { name: 'DR TIM', file: 'assets/DR TIM.jpg', lore: "The mad scientist of the flock. DR TIM experiments with on-chain mechanics that defy logic." },
+            { name: 'IAMJAY', file: 'assets/IAMJAY.jpg', lore: "A master of stealth and strategy. When IAMJAY appears, the meta is about to shift." },
+            { name: 'IEATDED', file: 'assets/IEATDED.jpg', lore: "A scavenger of dead projects, recycling liquidity into pure, unadulterated art." },
+            { name: 'JUST-ROB', file: 'assets/JUST-ROB.jpg', lore: "No complex mechanics. Just raw, unfiltered dedication to the ExpatQ3 ecosystem." },
+            { name: 'Rafiki web3', file: 'assets/Rafiki web3.jpg', lore: "The wise elder. Rafiki holds the keys to the GTD spots for those worthy of solving the puzzle." }
+        ]
+    },
+    {
+        id: 3,
+        title: "LEVEL 3: THE ASCENSION",
+        gridSize: 4,
+        timeLimit: 120,
+        unlocked: false,
+        arts: [
+            { name: 'VICTORX', file: 'assets/VICTORX.jpg', lore: "Victory is not an option, it is a state of being. The apex predator of the puzzle grid." },
+            { name: 'collcool_sneh', file: 'assets/collcool_sneh.jpg', lore: "Cool under pressure. Can you beat the clock before the colors fade into the blockchain?" },
+            { name: 'dark_jesus', file: 'assets/dark_jesus.jpg', lore: "A savior to some, a final boss to others. The ultimate test of your pointillism reconstruction skills." },
+            { name: 'erfan5427', file: 'assets/erfan5427.jpeg', lore: "An enigma wrapped in code. Only the fastest solvers can uncover the true identity of erfan5427." },
+            { name: 'prateek', file: 'assets/prateek.jpg', lore: "The final sentinel. Defeat this puzzle to claim your rightful place on the GTD leaderboard." }
+        ]
+    }
 ];
+
+// We will track the currently selected level globally
+let currentLevelData = LEVELS[0];
 
 // ──────────────────────────────────────────────────────
 //  DOM Refs
@@ -217,8 +265,32 @@ function isMobile() {
 }
 
 function buildGallery() {
+    // 1. Build Level Tabs
+    const tabsContainer = document.getElementById('level-tabs');
+    if (tabsContainer) {
+        tabsContainer.innerHTML = '';
+        LEVELS.forEach(lvl => {
+            const btn = document.createElement('button');
+            btn.className = 'level-tab';
+            btn.textContent = `LEVEL ${lvl.id}`;
+            if (lvl.id === currentLevelData.id) btn.classList.add('active');
+            if (!lvl.unlocked) {
+                btn.disabled = true;
+                btn.textContent += ' 🔒';
+            }
+            btn.onclick = () => {
+                if (lvl.unlocked) {
+                    currentLevelData = lvl;
+                    buildGallery(); // Re-render gallery for new level
+                }
+            };
+            tabsContainer.appendChild(btn);
+        });
+    }
+
+    // 2. Build Artwork Grid for Current Level
     dom.galleryGrid.innerHTML = '';
-    GALLERY.forEach(art => {
+    currentLevelData.arts.forEach(art => {
         const item = document.createElement('div');
         item.className = 'gallery-item';
 
@@ -233,14 +305,29 @@ function buildGallery() {
 
         item.appendChild(img);
         item.appendChild(label);
-        item.addEventListener('click', () => selectArt(art.file, art.name, item));
+        item.addEventListener('click', () => selectArt(art.file, art.name, item, art.lore));
         dom.galleryGrid.appendChild(item);
     });
+
+    // Reset selection when changing levels
+    selectArt(null, null, null, null);
+    
+    // Update Level Info Box in Sidebar
+    const infoBox = document.getElementById('level-info-box');
+    if (infoBox) {
+        infoBox.classList.remove('hidden');
+        document.getElementById('level-info-title').textContent = currentLevelData.title;
+        document.getElementById('level-info-desc').textContent = `${currentLevelData.gridSize}x${currentLevelData.gridSize} Grid • ${currentLevelData.timeLimit}s Time Limit`;
+    }
 }
 
-function selectArt(file, name, el) {
+let currentLore = ""; // Track lore of selected art
+
+function selectArt(file, name, el, lore) {
     document.querySelectorAll('.gallery-item').forEach(i => i.classList.remove('selected'));
     if (el) el.classList.add('selected');
+
+    currentLore = lore || "";
 
     selectedImg    = file;
     selectedArtist = name;
@@ -263,26 +350,92 @@ function selectArt(file, name, el) {
     }
 }
 
-// Image upload
-$('image-upload').addEventListener('change', e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => selectArt(ev.target.result, 'Guest: ' + file.name.replace(/\.[^.]+$/, ''));
-    reader.readAsDataURL(file);
-});
-
-// Grid Difficulty Selection
-document.querySelectorAll('.diff-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        gridSize = parseInt(btn.dataset.grid);
+// ──────────────────────────────────────────────────────
+//  Auth & Leaderboard Handlers
+// ──────────────────────────────────────────────────────
+const authBtn = document.getElementById('auth-x-btn');
+if (authBtn) {
+    authBtn.addEventListener('click', async () => {
+        if (!supabase) return alert("Supabase not initialized");
+        if (currentUser) {
+            // Log out
+            await supabase.auth.signOut();
+            currentUser = null;
+            updateAuthUI();
+        } else {
+            // Log in with X
+            await supabase.auth.signInWithOAuth({
+                provider: 'twitter',
+            });
+        }
     });
-});
+}
 
+const leaderboardBtn = document.getElementById('leaderboard-btn');
+const closeLbBtn = document.getElementById('close-leaderboard-btn');
+const lbModal = document.getElementById('leaderboard-modal');
+
+if (leaderboardBtn && lbModal) {
+    leaderboardBtn.addEventListener('click', async () => {
+        lbModal.classList.remove('hidden');
+        await fetchLeaderboard();
+    });
+}
+if (closeLbBtn && lbModal) {
+    closeLbBtn.addEventListener('click', () => {
+        lbModal.classList.add('hidden');
+    });
+}
+
+async function fetchLeaderboard() {
+    const list = document.getElementById('leaderboard-list');
+    if (!supabase) {
+        list.innerHTML = `<div style="text-align: center; color: var(--muted); padding: 2rem;">Backend not connected.</div>`;
+        return;
+    }
+    
+    list.innerHTML = `<div style="text-align: center; color: var(--gold); padding: 2rem;">Loading the masters...</div>`;
+    
+    // Fetch top 50 scores, sorted by level desc, total_time asc
+    const { data, error } = await supabase
+        .from('leaderboard')
+        .select('*')
+        .order('level_reached', { ascending: false })
+        .order('total_time', { ascending: true })
+        .limit(50);
+        
+    if (error) {
+        console.error("Leaderboard error:", error);
+        list.innerHTML = `<div style="text-align: center; color: red; padding: 2rem;">Error fetching ranks.</div>`;
+        return;
+    }
+    
+    if (!data || data.length === 0) {
+        list.innerHTML = `<div style="text-align: center; color: var(--muted); padding: 2rem;">No champions yet. Be the first!</div>`;
+        return;
+    }
+    
+    list.innerHTML = '';
+    data.forEach((row, index) => {
+        const item = document.createElement('div');
+        item.className = 'leaderboard-item';
+        
+        const m = Math.floor(row.total_time / 60).toString().padStart(2, '0');
+        const s = (row.total_time % 60).toString().padStart(2, '0');
+        
+        item.innerHTML = `
+            <div class="lb-rank">#${index + 1}</div>
+            <div class="lb-user">@${row.username} <span class="lb-level">LVL ${row.level_reached}</span></div>
+            <div class="lb-time">${m}:${s}</div>
+        `;
+        list.appendChild(item);
+    });
+}
+
+// No custom image upload or difficulty selection in GTD mode
 dom.launchBtn.onclick = () => {
     if (!selectedImg) return;
+    gridSize = currentLevelData.gridSize; // Apply GTD level mechanics
     showScreen('game');
     initPuzzle(selectedImg);
     shuffleBoard();
@@ -438,7 +591,7 @@ function checkWin() {
 // ──────────────────────────────────────────────────────
 function startTimer() {
     clearInterval(timerInterval);
-    secondsLeft = 180;
+    secondsLeft = currentLevelData.timeLimit;
     tick();
     timerInterval = setInterval(tick, 1000);
 }
@@ -449,11 +602,12 @@ function tick() {
     dom.timerDisplay.textContent = `${m}:${s}`;
     dom.timerDisplay.classList.toggle('danger', secondsLeft <= 30);
 
-    // 3x3 Dynamic Lifeline Mechanic: Show Number only available when time is half (<= 90s left out of 180s)
+    // 3x3 Dynamic Lifeline Mechanic: Show Number only available when time is half
     if (gridSize === 3) {
-        if (secondsLeft > 90) {
+        const halfTime = Math.floor(currentLevelData.timeLimit / 2);
+        if (secondsLeft > halfTime) {
             dom.toggleNumBtn.disabled = true;
-            dom.toggleNumBtn.textContent = `SHOW NUMBERS (LOCKED - ${secondsLeft - 90}s)`;
+            dom.toggleNumBtn.textContent = `SHOW NUMBERS (LOCKED - ${secondsLeft - halfTime}s)`;
         } else {
             dom.toggleNumBtn.disabled = false;
             if (!showNumbers) {
@@ -471,7 +625,7 @@ function tick() {
 }
 
 // ──────────────────────────────────────────────────────
-//  Game End
+//  Game End & Level Progression
 // ──────────────────────────────────────────────────────
 function endGame(win) {
     gameStarted = false;
@@ -483,13 +637,40 @@ function endGame(win) {
     if (overlayArt && selectedImg) overlayArt.src = selectedImg;
 
     if (win) {
-        const elapsed = 180 - secondsLeft;
+        const elapsed = currentLevelData.timeLimit - secondsLeft;
         const m = Math.floor(elapsed/60).toString().padStart(2,'0');
         const s = (elapsed % 60).toString().padStart(2,'0');
         dom.overlayIcon.className = 'overlay-icon';
         dom.overlayIcon.textContent = '✓';
-        dom.statusTitle.textContent = 'AUTHENTICATED';
-        dom.statusText.textContent  = `${selectedArtist}'s masterpiece restored in ${m}:${s}.`;
+        dom.statusTitle.textContent = `${currentLevelData.title} CLEARED!`;
+        
+        let statusHtml = `<strong>${selectedArtist}</strong> authenticated in ${m}:${s}.<br><br>`;
+        statusHtml += `<em style="color:var(--gold); font-size:0.9rem;">"${currentLore}"</em>`;
+        
+        // Unlock next level logic
+        const nextLevelIndex = LEVELS.findIndex(l => l.id === currentLevelData.id) + 1;
+        if (nextLevelIndex < LEVELS.length) {
+            LEVELS[nextLevelIndex].unlocked = true;
+            statusHtml += `<br><br><span style="color:#2ecc71; font-weight:bold;">🔓 LEVEL ${LEVELS[nextLevelIndex].id} UNLOCKED!</span>`;
+        } else {
+            statusHtml += `<br><br><span style="color:#2ecc71; font-weight:bold;">🏆 GTD MASTER RANK ACHIEVED!</span>`;
+        }
+        
+        // Push Score to Leaderboard
+        if (currentUser && supabase) {
+            const handle = currentUser.user_metadata?.user_name || currentUser.user_metadata?.preferred_username || "Authenticated";
+            supabase.from('leaderboard').upsert({
+                username: handle,
+                level_reached: currentLevelData.id,
+                total_time: elapsed
+            }, { onConflict: 'username' })
+            .then(({ error }) => {
+                if (error) console.error("Error saving score:", error);
+                else console.log("Score saved to GTD Leaderboard!");
+            });
+        }
+        
+        dom.statusText.innerHTML = statusHtml;
     } else {
         dom.overlayIcon.className = 'overlay-icon fail';
         dom.overlayIcon.textContent = '✕';
@@ -557,7 +738,7 @@ function generateShareCard() {
             ctx.fillText(`🎨 ${selectedArtist}`, 400, 600);
 
             // Time
-            const elapsed = 180 - secondsLeft;
+            const elapsed = currentLevelData.timeLimit - secondsLeft;
             const m = Math.floor(elapsed / 60).toString().padStart(2, '0');
             const s = (elapsed % 60).toString().padStart(2, '0');
             ctx.fillStyle = '#e8c16a';
@@ -567,7 +748,7 @@ function generateShareCard() {
             // Status
             ctx.fillStyle = '#e8c16a';
             ctx.font = 'bold 20px "Inter", sans-serif';
-            ctx.fillText('✓ AUTHENTICATED', 400, 710);
+            ctx.fillText(`✓ ${currentLevelData.title} CLEARED`, 400, 710);
 
             // Footer
             ctx.fillStyle = '#555';
@@ -585,7 +766,7 @@ function generateShareCard() {
             ctx.fillStyle = '#f2f2f5';
             ctx.font = '24px sans-serif';
             ctx.fillText(`🎨 ${selectedArtist}`, 400, 400);
-            ctx.fillText('✓ AUTHENTICATED', 400, 460);
+            ctx.fillText(`✓ ${currentLevelData.title} CLEARED`, 400, 460);
             canvas.toBlob((blob) => resolve(blob), 'image/png');
         };
         img.src = selectedImg;
@@ -593,10 +774,10 @@ function generateShareCard() {
 }
 
 $('share-x-btn').onclick = async () => {
-    const elapsed = 180 - secondsLeft;
+    const elapsed = currentLevelData.timeLimit - secondsLeft;
     const m = Math.floor(elapsed/60).toString().padStart(2,'0');
     const s = (elapsed % 60).toString().padStart(2,'0');
-    const tweetText = `**art authentication complete** 🔻\n\nreconstructed ${selectedArtist}'s pointillism masterpiece in exactly ${m}:${s} against the clock.\n\nno cheats. just raw stipples.\n\nbeat my time here: https://thebeaks-puzzle.vercel.app/\n\n@DKashtalyan @thebeaksart @ssheyii @MartKAD 🧩\n\nhttps://x.com/ExpatQ3/status/2056048595199987823?s=20`;
+    const tweetText = `**${currentLevelData.title} cleared** 🔻\n\nreconstructed ${selectedArtist}'s pointillism masterpiece in exactly ${m}:${s} against the clock.\n\n"${currentLore}"\n\nbeat my time here: https://thebeaks-puzzle.vercel.app/\n\n@DKashtalyan @thebeaksart @ssheyii @MartKAD 🧩\n\nhttps://x.com/ExpatQ3/status/2056048595199987823?s=20`;
 
 
     let imageCopied = false;
@@ -679,13 +860,6 @@ dom.toggleNumBtn.addEventListener('click', () => {
 $('back-to-gallery-btn').addEventListener('click', () => {
     const sidebar = document.querySelector('.panel-sidebar');
     sidebar.classList.remove('mobile-active');
-});
-
-// Recalc tile sizes on resize
-window.addEventListener('resize', () => {
-    if (gameStarted && selectedImg) {
-        initPuzzle(selectedImg);
-    }
 });
 
 // ──────────────────────────────────────────────────────

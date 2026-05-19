@@ -11,6 +11,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Playfair+Display:wght@700;900&display=swap"
         rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -90,14 +91,32 @@
             <div class="setup-header-row">
                 <button id="back-to-home-btn" class="btn-back-link">&larr; BACK TO HOME</button>
                 <h2 class="page-title">SELECT YOUR CANVAS</h2>
+                <div class="header-actions">
+                    <button id="auth-x-btn" class="btn-secondary" style="font-size: 0.7rem; padding: 0.5rem 0.8rem;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                        CONNECT X
+                    </button>
+                    <button id="leaderboard-btn" class="btn-primary" style="font-size: 0.7rem; padding: 0.5rem 0.8rem;">🏆 LEADERBOARD</button>
+                </div>
             </div>
 
             <div class="setup-layout">
 
-                <!-- Gallery -->
+                <!-- Levels & Gallery -->
                 <div class="setup-panel panel-gallery">
                     <div class="panel-head">
-                        <h3>THE BEAKS GALLERY</h3>
+                        <h3>SELECT LEVEL</h3>
+                        <p>Complete a level to unlock the next</p>
+                    </div>
+                    
+                    <div class="level-tabs" id="level-tabs">
+                        <!-- Injected by JS: Level buttons go here -->
+                    </div>
+
+                    <div class="panel-head" style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                        <h3 id="gallery-title">THE BEAKS GALLERY</h3>
                         <p>Pick a piece to authenticate</p>
                     </div>
                     <div class="gallery-grid" id="gallery-container">
@@ -105,12 +124,12 @@
                     </div>
                 </div>
 
-                <!-- Sidebar: Selected + Upload -->
+                <!-- Sidebar: Selected Art -->
                 <div class="setup-panel panel-sidebar">
                     <button id="back-to-gallery-btn" class="btn-back-mobile">&larr; BACK TO GALLERY</button>
                     <div class="panel-head">
                         <h3>SELECTED ART</h3>
-                        <p id="selection-status">Choose from gallery or upload below</p>
+                        <p id="selection-status">Choose from gallery to begin</p>
                     </div>
 
                     <div class="selected-preview-box" id="preview-box">
@@ -122,25 +141,9 @@
                         🎨 <span id="artist-name-val"></span>
                     </p>
 
-                    <div class="upload-section">
-                        <label for="image-upload" class="upload-zone" id="drop-zone">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <polyline points="16 16 12 12 8 16" />
-                                <line x1="12" y1="12" x2="12" y2="21" />
-                                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
-                            </svg>
-                            <span id="upload-label">Upload Your Own Art</span>
-                            <input type="file" id="image-upload" accept="image/*">
-                        </label>
-                    </div>
-
-                    <div class="difficulty-section">
-                        <h4>GRID SIZE / DIFFICULTY</h4>
-                        <div class="difficulty-options">
-                            <button type="button" class="diff-btn active" data-grid="3">3 x 3 (EASY)</button>
-                            <button type="button" class="diff-btn" data-grid="4">4 x 4 (CHALLENGE)</button>
-                        </div>
+                    <div class="level-info-box hidden" id="level-info-box">
+                        <h4 id="level-info-title">LEVEL 1</h4>
+                        <p id="level-info-desc">3x3 Grid • 180s Time Limit</p>
                     </div>
 
                     <button id="launch-game-btn" class="btn-primary launch-btn" disabled>
@@ -214,6 +217,24 @@
                 </button>
             </div>
         </div>
+
+        <!-- Leaderboard Modal -->
+        <div id="leaderboard-modal" class="overlay-screen hidden" style="z-index: 1000; background: rgba(10,10,14,0.95);">
+            <div class="overlay-content" style="max-width: 600px; width: 90%;">
+                <h1 style="color: var(--gold); margin-bottom: 0.5rem;">🏆 GTD LEADERBOARD</h1>
+                <p style="color: var(--muted); margin-bottom: 2rem;">Top speeds across all completed levels.</p>
+                
+                <div class="leaderboard-list" id="leaderboard-list" style="text-align: left; max-height: 50vh; overflow-y: auto; margin-bottom: 2rem;">
+                    <!-- Injected by JS -->
+                    <div style="text-align: center; color: var(--muted); padding: 2rem;">Loading the masters...</div>
+                </div>
+
+                <div class="overlay-actions">
+                    <button id="close-leaderboard-btn" class="btn-secondary" style="width: 100%;">CLOSE</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Hidden canvas for generating share card -->
         <canvas id="share-canvas" style="display:none;"></canvas>
     </div>
