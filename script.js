@@ -12,12 +12,12 @@ const SUPABASE_URL = 'https://zxpqltyjojxtltxoqlhg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4cHFsdHlqb2p4dGx0eG9xbGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNzMzODcsImV4cCI6MjA5NDc0OTM4N30.k_fWjuWXag0Poq1TVP4TNMBRAu1rBWhVZL2c1BQeBMA';
 
 // Initialize Supabase Client (from CDN)
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 let currentUser = null;
 
 // Attempt to get existing session
-if (supabase) {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+if (supabaseClient) {
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
         if (session) {
             currentUser = session.user;
             updateAuthUI();
@@ -25,7 +25,7 @@ if (supabase) {
     });
 
     // Listen for auth state changes (e.g. returning from X login)
-    supabase.auth.onAuthStateChange((_event, session) => {
+    supabaseClient.auth.onAuthStateChange((_event, session) => {
         currentUser = session?.user || null;
         updateAuthUI();
     });
@@ -365,15 +365,15 @@ function selectArt(file, name, el, lore) {
 const authBtn = document.getElementById('auth-x-btn');
 if (authBtn) {
     authBtn.addEventListener('click', async () => {
-        if (!supabase) return alert("Supabase not initialized");
+        if (!supabaseClient) return alert("Supabase not initialized");
         if (currentUser) {
             // Log out
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             currentUser = null;
             updateAuthUI();
         } else {
             // Log in with X
-            await supabase.auth.signInWithOAuth({
+            await supabaseClient.auth.signInWithOAuth({
                 provider: 'twitter',
             });
         }
@@ -398,7 +398,7 @@ if (closeLbBtn && lbModal) {
 
 async function fetchLeaderboard() {
     const list = document.getElementById('leaderboard-list');
-    if (!supabase) {
+    if (!supabaseClient) {
         list.innerHTML = `<div style="text-align: center; color: var(--muted); padding: 2rem;">Backend not connected.</div>`;
         return;
     }
@@ -406,7 +406,7 @@ async function fetchLeaderboard() {
     list.innerHTML = `<div style="text-align: center; color: var(--gold); padding: 2rem;">Loading the masters...</div>`;
     
     // Fetch top 50 scores, sorted by level desc, total_time asc
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('leaderboard')
         .select('*')
         .order('level_reached', { ascending: false })
@@ -666,9 +666,9 @@ function endGame(win) {
         }
         
         // Push Score to Leaderboard
-        if (currentUser && supabase) {
+        if (currentUser && supabaseClient) {
             const handle = currentUser.user_metadata?.user_name || currentUser.user_metadata?.preferred_username || "Authenticated";
-            supabase.from('leaderboard').upsert({
+            supabaseClient.from('leaderboard').upsert({
                 username: handle,
                 level_reached: currentLevelData.id,
                 total_time: elapsed
