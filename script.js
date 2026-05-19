@@ -150,25 +150,34 @@ const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
 
 function initAudio() {
-    if (!audioCtx) audioCtx = new AudioCtx();
+    try {
+        if (!audioCtx && AudioCtx) audioCtx = new AudioCtx();
+    } catch(e) {
+        console.warn('Audio initialization failed or not supported:', e);
+    }
 }
 
 function playFlipSound() {
     initAudio();
-    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.12, audioCtx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) {
-        // White noise with fast decay — sounds like a page flip
-        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 3);
+    if (!audioCtx) return;
+    try {
+        const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.12, audioCtx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < data.length; i++) {
+            // White noise with fast decay — sounds like a page flip
+            data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 3);
+        }
+        const src = audioCtx.createBufferSource();
+        src.buffer = buf;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 800;
+        src.connect(filter);
+        filter.connect(audioCtx.destination);
+        src.start();
+    } catch(e) {
+        console.warn('Audio playback failed', e);
     }
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf;
-    const filter = audioCtx.createBiquadFilter();
-    filter.type = 'highpass';
-    filter.frequency.value = 800;
-    src.connect(filter);
-    filter.connect(audioCtx.destination);
-    src.start();
 }
 
 // ──────────────────────────────────────────────────────
