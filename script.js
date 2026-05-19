@@ -289,6 +289,8 @@ function buildMap() {
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("class", "map-path");
+    svg.setAttribute("viewBox", "0 0 100 100");
+    svg.setAttribute("preserveAspectRatio", "none");
     
     // Coordinates for the 3 levels (percentage based for responsiveness)
     // Pathway goes from bottom-left, to middle-right, to top-center
@@ -300,10 +302,10 @@ function buildMap() {
     
     // Create the curved path
     const path = document.createElementNS(svgNS, "path");
-    // Draw bezier curves between the nodes
-    const d = `M ${positions[0].x}% ${positions[0].y}% 
-               C 50% 80%, 30% 50%, ${positions[1].x}% ${positions[1].y}% 
-               C 100% 50%, 80% 20%, ${positions[2].x}% ${positions[2].y}%`;
+    // Draw bezier curves between the nodes using 0-100 viewBox coordinates
+    const d = `M ${positions[0].x} ${positions[0].y} 
+               C 50 80, 30 50, ${positions[1].x} ${positions[1].y} 
+               C 100 50, 80 20, ${positions[2].x} ${positions[2].y}`;
     path.setAttribute("d", d);
     svg.appendChild(path);
     container.appendChild(svg);
