@@ -443,67 +443,136 @@ button { cursor:pointer; font-family:inherit; }
     text-align: center;
 }
 
-/* Level Selection Tabs */
-.level-tabs {
+/* ═══════════════════════════════════════════════════
+   PHASE 2 — Map Screen
+═══════════════════════════════════════════════════ */
+#map-screen {
+    background: url('assets/beaks_map.png') center/cover no-repeat;
     display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
 }
 
-.level-tab {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 0.7rem 1.2rem;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: var(--trans);
-    flex: 1;
-    text-align: center;
-    letter-spacing: 0.1em;
+#map-screen::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10, 10, 14, 0.6); /* Darken the map background slightly */
+    z-index: 1;
 }
 
-.level-tab:hover:not(:disabled) {
-    border-color: var(--gold);
-    color: var(--white);
+.map-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1000px;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.level-tab.active {
-    background: var(--gold);
-    color: #000;
-    border-color: var(--gold);
-    box-shadow: 0 0 15px rgba(232, 193, 106, 0.4);
-}
-
-.level-tab:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    background: transparent;
-}
-
-/* Level Info Box */
-.level-info-box {
-    background: rgba(232, 193, 106, 0.05);
-    border: 1px dashed var(--gold);
-    padding: 1rem;
-    border-radius: 8px;
-    text-align: center;
-    margin-top: 1rem;
-}
-
-.level-info-box h4 {
+.map-title {
     color: var(--gold);
     font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    margin-bottom: 0.3rem;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 20px rgba(232, 193, 106, 0.4);
 }
 
-.level-info-box p {
+.map-subtitle {
     color: var(--muted);
-    font-size: 0.85rem;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.map-nodes-container {
+    flex: 1;
+    width: 100%;
+    position: relative;
+}
+
+/* Map Nodes */
+.map-node {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(10, 10, 14, 0.8);
+    border: 2px solid var(--border);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--white);
+    font-weight: 800;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: var(--trans);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.map-node::after {
+    content: '';
+    position: absolute;
+    bottom: -30px;
+    font-size: 0.8rem;
+    color: var(--gold);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-family: 'Playfair Display', serif;
+}
+
+.map-node:hover:not(.locked) {
+    transform: translate(-50%, -50%) scale(1.1);
+    border-color: var(--gold);
+    box-shadow: 0 0 30px rgba(232, 193, 106, 0.4);
+}
+
+.map-node.unlocked {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.map-node.active-glow {
+    animation: nodePulse 2s infinite;
+}
+
+@keyframes nodePulse {
+    0% { box-shadow: 0 0 0 0 rgba(232, 193, 106, 0.7); }
+    70% { box-shadow: 0 0 0 20px rgba(232, 193, 106, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(232, 193, 106, 0); }
+}
+
+.map-node.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(30, 30, 30, 0.8);
+    border-color: #333;
+    color: #666;
+}
+
+/* SVG Path connecting nodes */
+.map-path {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.map-path path {
+    fill: none;
+    stroke: rgba(232, 193, 106, 0.2);
+    stroke-width: 4px;
+    stroke-dasharray: 10;
+    animation: dash 30s linear infinite;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: -1000;
+    }
 }
 
 /* Leaderboard Rows */

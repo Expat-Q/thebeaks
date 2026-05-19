@@ -67,6 +67,7 @@ const LEVELS = [
     {
         id: 1,
         title: "LEVEL 1: THE AWAKENING",
+        levelLore: "In the beginning, there was only the void. The first Beaks emerged from the digital ether, forming a chaotic but powerful flock. Your journey begins here, where the fundamentals of existence are drawn in stippled reality. Prove your worth by reassembling these foundational artifacts.",
         gridSize: 3,
         timeLimit: 180,
         unlocked: true,
@@ -80,6 +81,7 @@ const LEVELS = [
     {
         id: 2,
         title: "LEVEL 2: THE PILGRIMAGE",
+        levelLore: "Having mastered the basics, you enter the treacherous midlands. The flock has scattered, their forms becoming more complex and abstract. Time moves differently here. Only those with true vision can navigate the visual static to find the hidden patterns.",
         gridSize: 4,
         timeLimit: 180,
         unlocked: false,
@@ -94,6 +96,7 @@ const LEVELS = [
     {
         id: 3,
         title: "LEVEL 3: THE ASCENSION",
+        levelLore: "The apex of your journey. These legendary artifacts contain the pure, unfiltered essence of ExpatQ3. The time constraint is brutal, the pieces are fragmented, and only the elite will secure their Guaranteed Mint spot. Do you have what it takes?",
         gridSize: 4,
         timeLimit: 120,
         unlocked: false,
@@ -119,6 +122,7 @@ const SCREENS = {
     flip:       $('book-flip-screen'),
     video:      $('video-screen'),
     intro:      $('intro-screen'),
+    map:        $('map-screen'),
     setup:      $('setup-screen'),
     game:       $('game-screen'),
     completion: $('message'),
@@ -246,9 +250,12 @@ $('skip-video-btn').onclick = () => { dom.introVideo.pause(); showScreen('intro'
 dom.introVideo.muted = false;
 
 // ──────────────────────────────────────────────────────
-//  Phase 2: Landing
+//  Phase 2: Landing & Navigation
 // ──────────────────────────────────────────────────────
-$('start-btn').onclick = () => showScreen('setup');
+$('start-btn').onclick = () => {
+    buildMap();
+    showScreen('map');
+};
 
 // Back Buttons Navigation
 $('back-to-flip-btn').onclick = () => {
@@ -262,8 +269,99 @@ $('back-to-video-btn').onclick = () => {
     dom.introVideo.play().catch(() => {});
 };
 
-$('back-to-home-btn').onclick = () => {
+$('back-to-home-from-map-btn').onclick = () => {
     showScreen('intro');
+};
+
+$('back-to-map-btn').onclick = () => {
+    showScreen('map');
+};
+
+// ──────────────────────────────────────────────────────
+//  Map Building Logic
+// ──────────────────────────────────────────────────────
+function buildMap() {
+    const container = $('map-nodes-container');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    // Draw SVG Path
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "map-path");
+    
+    // Coordinates for the 3 levels (percentage based for responsiveness)
+    // Pathway goes from bottom-left, to middle-right, to top-center
+    const positions = [
+        { x: 20, y: 80 }, // Level 1: Bottom Left
+        { x: 80, y: 50 }, // Level 2: Middle Right
+        { x: 50, y: 20 }  // Level 3: Top Center
+    ];
+    
+    // Create the curved path
+    const path = document.createElementNS(svgNS, "path");
+    // Draw bezier curves between the nodes
+    const d = `M ${positions[0].x}% ${positions[0].y}% 
+               C 50% 80%, 30% 50%, ${positions[1].x}% ${positions[1].y}% 
+               C 100% 50%, 80% 20%, ${positions[2].x}% ${positions[2].y}%`;
+    path.setAttribute("d", d);
+    svg.appendChild(path);
+    container.appendChild(svg);
+    
+    // Create Nodes
+    LEVELS.forEach((lvl, index) => {
+        const node = document.createElement('div');
+        node.className = 'map-node';
+        if (lvl.unlocked) {
+            node.classList.add('unlocked');
+            // If it's the highest unlocked level, make it glow
+            const isHighestUnlocked = (index === LEVELS.length - 1) || !LEVELS[index + 1].unlocked;
+            if (isHighestUnlocked) node.classList.add('active-glow');
+        } else {
+            node.classList.add('locked');
+            node.innerHTML = '🔒';
+        }
+        
+        node.style.left = positions[index].x + '%';
+        node.style.top = positions[index].y + '%';
+        
+        if (lvl.unlocked) node.textContent = lvl.id;
+        
+        // Label for the node
+        const label = document.createElement('div');
+        label.textContent = lvl.title;
+        label.style.position = 'absolute';
+        label.style.bottom = '-30px';
+        label.style.fontSize = '0.8rem';
+        label.style.color = 'var(--gold)';
+        label.style.whiteSpace = 'nowrap';
+        label.style.fontFamily = "'Playfair Display', serif";
+        label.style.textShadow = '0 0 5px #000';
+        node.appendChild(label);
+        
+        node.onclick = () => {
+            if (lvl.unlocked) {
+                currentLevelData = lvl;
+                showLevelLore(lvl);
+            }
+        };
+        
+        container.appendChild(node);
+    });
+}
+
+function showLevelLore(lvl) {
+    const modal = $('level-lore-modal');
+    if (!modal) return;
+    $('lore-modal-title').textContent = lvl.title;
+    $('lore-modal-text').textContent = lvl.levelLore;
+    modal.classList.remove('hidden');
+}
+
+$('proceed-to-gallery-btn').onclick = () => {
+    $('level-lore-modal').classList.add('hidden');
+    buildGallery();
+    showScreen('setup');
 };
 
 // ──────────────────────────────────────────────────────
@@ -274,30 +372,7 @@ function isMobile() {
 }
 
 function buildGallery() {
-    // 1. Build Level Tabs
-    const tabsContainer = document.getElementById('level-tabs');
-    if (tabsContainer) {
-        tabsContainer.innerHTML = '';
-        LEVELS.forEach(lvl => {
-            const btn = document.createElement('button');
-            btn.className = 'level-tab';
-            btn.textContent = `LEVEL ${lvl.id}`;
-            if (lvl.id === currentLevelData.id) btn.classList.add('active');
-            if (!lvl.unlocked) {
-                btn.disabled = true;
-                btn.textContent += ' 🔒';
-            }
-            btn.onclick = () => {
-                if (lvl.unlocked) {
-                    currentLevelData = lvl;
-                    buildGallery(); // Re-render gallery for new level
-                }
-            };
-            tabsContainer.appendChild(btn);
-        });
-    }
-
-    // 2. Build Artwork Grid for Current Level
+    // 1. Build Artwork Grid for Current Level
     dom.galleryGrid.innerHTML = '';
     currentLevelData.arts.forEach(art => {
         const item = document.createElement('div');
