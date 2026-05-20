@@ -7,7 +7,7 @@
     <title>THE BEAKS | NFT Art Puzzle</title>
     <meta name="description"
         content="Solve the puzzle to reveal rare NFT artwork by Dima Kashtalyan and the Beaks community.">
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Playfair+Display:wght@700;900&display=swap"
         rel="stylesheet">
@@ -85,6 +85,13 @@
                     A genesis collection of 1,111 surreal characters forged in stippling &amp; pointillism. Each piece a
                     world. Each puzzle a key.
                 </p>
+                <div class="x-handle-wrap">
+                    <label for="x-handle-input" class="x-handle-label">Enter your X handle to play</label>
+                    <div class="x-handle-input-group">
+                        <span class="x-handle-prefix">@</span>
+                        <input type="text" id="x-handle-input" class="x-handle-field" placeholder="your_handle" autocomplete="off" spellcheck="false">
+                    </div>
+                </div>
                 <button id="start-btn" class="btn-primary">ENTER ART STUDIO</button>
             </div>
         </div>
@@ -97,7 +104,10 @@
     <section id="map-screen" class="screen hidden scrollable">
         <button id="back-to-home-from-map-btn" class="btn-back-link btn-back-top">&larr; BACK</button>
         <div class="map-container">
-            <h1 class="map-title">THE PATH OF ASCENSION</h1>
+            <div class="map-header-row">
+                <h1 class="map-title">THE PATH OF ASCENSION</h1>
+                <button id="leaderboard-btn" class="btn-primary map-leaderboard-btn">🏆 LEADERBOARD</button>
+            </div>
             <p class="map-subtitle">Conquer each tier to secure your GTD spot.</p>
             <div id="map-nodes-container" class="map-nodes-container">
                 <!-- Nodes injected by JS -->
@@ -114,13 +124,6 @@
                 <button id="back-to-map-btn" class="btn-back-link">&larr; BACK TO MAP</button>
                 <h2 class="page-title">SELECT YOUR CANVAS</h2>
                 <div class="header-actions">
-                    <button id="auth-x-btn" class="btn-secondary" style="font-size: 0.7rem; padding: 0.5rem 0.8rem;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
-                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                        </svg>
-                        CONNECT X
-                    </button>
-                    <button id="leaderboard-btn" class="btn-primary" style="font-size: 0.7rem; padding: 0.5rem 0.8rem;">🏆 LEADERBOARD</button>
                 </div>
             </div>
 
@@ -262,7 +265,7 @@
         </div>
     </div>
 
-    <script src="script.js?v=3"></script>
+    <script src="script.js?v=4"></script>
 </body>
 
 </html>

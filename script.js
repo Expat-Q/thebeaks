@@ -11,40 +11,12 @@
 const SUPABASE_URL = 'https://zxpqltyjojxtltxoqlhg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4cHFsdHlqb2p4dGx0eG9xbGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNzMzODcsImV4cCI6MjA5NDc0OTM4N30.k_fWjuWXag0Poq1TVP4TNMBRAu1rBWhVZL2c1BQeBMA';
 
-// Initialize Supabase Client (from CDN)
+// Initialize Supabase Client (for leaderboard only — no auth)
 const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-let currentUser = null;
-
-// Attempt to get existing session
-if (supabaseClient) {
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-        if (session) {
-            currentUser = session.user;
-            updateAuthUI();
-        }
-    });
-
-    // Listen for auth state changes (e.g. returning from X login)
-    supabaseClient.auth.onAuthStateChange((_event, session) => {
-        currentUser = session?.user || null;
-        updateAuthUI();
-    });
-}
+let playerHandle = ''; // Manually entered X handle
 
 function updateAuthUI() {
-    const btn = document.getElementById('auth-x-btn');
-    if (!btn) return;
-    if (currentUser) {
-        // User's Twitter handle is usually in user_metadata.user_name or preferred_username
-        const handle = currentUser.user_metadata?.user_name || currentUser.user_metadata?.preferred_username || "Authenticated";
-        btn.innerHTML = `<span style="color: #2ecc71;">✓ @${handle}</span>`;
-        btn.classList.add('authenticated');
-    } else {
-        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
-                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                        </svg> CONNECT X`;
-        btn.classList.remove('authenticated');
-    }
+    // No longer needed — using manual handle input
 }
 
 // ──────────────────────────────────────────────────────
@@ -72,16 +44,38 @@ const LEVELS = [
         timeLimit: 180,
         unlocked: true,
         arts: [
-            { name: 'Dima Kashtalyan', file: 'assets/1st collection.jpg', lore: "Forged in the fiery stipples of creation, this beak emerged from the ash to lead the flock." },
-            { name: 'ANYA MISAAKI', file: 'assets/ANYA MISAAKI.jpg', lore: "A silent watcher from the digital canopy, preserving the ancient secrets of the ExpatQ3 realm." },
-            { name: 'AURORA', file: 'assets/AURORA.jpg', lore: "Born under the neon lights of the metaverse, Aurora guides lost players through the grid." },
-            { name: 'CITYBOY', file: 'assets/CITYBOY.jpg', lore: "A true native of the blockchain streets. The Cityboy never sleeps, constantly hunting for alpha." }
+            { name: 'Dima Kashtalyan', file: 'assets/1st collection.jpg', lore: "The genesis piece. Forged in the fiery stipples of creation, this beak emerged from the ash to lead the flock." },
+            { name: '2nd Collection', file: 'assets/2nd collection.jpg', lore: "The second wave. A deeper descent into the surreal world of pointillism." },
+            { name: '3rd Collection', file: 'assets/3rd collection.jpg', lore: "The third evolution. Where art meets the infinite complexity of the metaverse." },
+            { name: 'Art Piece I', file: 'assets/art 1.jpg', lore: "A raw study in stippled form. The foundation upon which all Beaks are built." },
+            { name: 'Art Piece II', file: 'assets/art 2.jpg', lore: "Light and shadow dance in pointillism harmony." },
+            { name: 'Art Piece III', file: 'assets/art 3.jpg', lore: "The third canvas speaks of transformation and rebirth." },
+            { name: 'Art Piece IV', file: 'assets/art 4.jpg', lore: "A meditation on form and void, rendered in a thousand dots." },
+            { name: 'Yo', file: 'assets/yo.jpg', lore: "A declaration of presence in the digital frontier." }
         ]
     },
     {
         id: 2,
         title: "LEVEL 2: THE PILGRIMAGE",
         levelLore: "Having mastered the basics, you enter the treacherous midlands. The flock has scattered, their forms becoming more complex and abstract. Time moves differently here. Only those with true vision can navigate the visual static to find the hidden patterns.",
+        gridSize: 3,
+        timeLimit: 150,
+        unlocked: false,
+        arts: [
+            { name: 'ANYA MISAAKI', file: 'assets/ANYA MISAAKI.jpg', lore: "A silent watcher from the digital canopy, preserving the ancient secrets of the ExpatQ3 realm." },
+            { name: 'AURORA', file: 'assets/AURORA.jpg', lore: "Born under the neon lights of the metaverse, Aurora guides lost players through the grid." },
+            { name: 'CITYBOY', file: 'assets/CITYBOY.jpg', lore: "A true native of the blockchain streets. The Cityboy never sleeps, constantly hunting for alpha." },
+            { name: 'Ashley', file: 'assets/Ashley.jpg', lore: "Quiet determination meets artistic brilliance. Ashley's piece whispers of hidden depths." },
+            { name: 'Miss Ayo', file: 'assets/miss ayo.jpg', lore: "Grace under pressure. Miss Ayo's presence commands respect on the leaderboard." },
+            { name: 'Sharu DS', file: 'assets/sharu DS.jpg', lore: "A digital sculptor of rare form. Every dot is placed with surgical precision." },
+            { name: 'dhirajleg', file: 'assets/@dhirajleg.jpg', lore: "A cartographer of the metaverse, mapping uncharted territories in ink and pixel." },
+            { name: 'lucas950825', file: 'assets/@lucas950825.jpg', lore: "Numbers hold meaning. This cryptographer embeds secrets within every stipple." }
+        ]
+    },
+    {
+        id: 3,
+        title: "LEVEL 3: THE TRIAL",
+        levelLore: "The grid expands. What was once a 3x3 challenge becomes a 4x4 labyrinth of fragmented art. The Trial separates the casual players from the true believers. Your pattern recognition must evolve or you will be consumed by the complexity.",
         gridSize: 4,
         timeLimit: 180,
         unlocked: false,
@@ -90,22 +84,47 @@ const LEVELS = [
             { name: 'IAMJAY', file: 'assets/IAMJAY.jpg', lore: "A master of stealth and strategy. When IAMJAY appears, the meta is about to shift." },
             { name: 'IEATDED', file: 'assets/IEATDED.jpg', lore: "A scavenger of dead projects, recycling liquidity into pure, unadulterated art." },
             { name: 'JUST-ROB', file: 'assets/JUST-ROB.jpg', lore: "No complex mechanics. Just raw, unfiltered dedication to the ExpatQ3 ecosystem." },
-            { name: 'Rafiki web3', file: 'assets/Rafiki web3.jpg', lore: "The wise elder. Rafiki holds the keys to the GTD spots for those worthy of solving the puzzle." }
+            { name: 'Rafiki web3', file: 'assets/Rafiki web3.jpg', lore: "The wise elder. Rafiki holds the keys to the GTD spots for those worthy of solving the puzzle." },
+            { name: 'batt004', file: 'assets/@batt004.jpg', lore: "Charged with creative energy, batt004 powers through the grid with electric precision." },
+            { name: 'valkiz_jr', file: 'assets/@valkiz_jr.jpg', lore: "A rising star in the flock, earning their stripes one solved puzzle at a time." },
+            { name: 'verah_tee', file: 'assets/@verah_tee.jpg', lore: "Elegance in every dot. Verah's art transcends the digital and touches the soul." }
         ]
     },
     {
-        id: 3,
-        title: "LEVEL 3: THE ASCENSION",
-        levelLore: "The apex of your journey. These legendary artifacts contain the pure, unfiltered essence of ExpatQ3. The time constraint is brutal, the pieces are fragmented, and only the elite will secure their Guaranteed Mint spot. Do you have what it takes?",
+        id: 4,
+        title: "LEVEL 4: THE CRUCIBLE",
+        levelLore: "The crucible burns away the unworthy. Time is your enemy now — 150 seconds to reconstruct masterpieces fragmented into 16 pieces. Every second wasted is a step closer to failure. Only the sharpest minds survive the crucible.",
         gridSize: 4,
-        timeLimit: 120,
+        timeLimit: 150,
         unlocked: false,
         arts: [
             { name: 'VICTORX', file: 'assets/VICTORX.jpg', lore: "Victory is not an option, it is a state of being. The apex predator of the puzzle grid." },
             { name: 'collcool_sneh', file: 'assets/collcool_sneh.jpg', lore: "Cool under pressure. Can you beat the clock before the colors fade into the blockchain?" },
             { name: 'dark_jesus', file: 'assets/dark_jesus.jpg', lore: "A savior to some, a final boss to others. The ultimate test of your pointillism reconstruction skills." },
             { name: 'erfan5427', file: 'assets/erfan5427.jpeg', lore: "An enigma wrapped in code. Only the fastest solvers can uncover the true identity of erfan5427." },
-            { name: 'prateek', file: 'assets/prateek.jpg', lore: "The final sentinel. Defeat this puzzle to claim your rightful place on the GTD leaderboard." }
+            { name: 'prateek', file: 'assets/prateek.jpg', lore: "The final sentinel. Defeat this puzzle to claim your rightful place on the GTD leaderboard." },
+            { name: '0x_Castar', file: 'assets/@0x_Castar.jpeg', lore: "Cast from the forge of decentralization, 0x_Castar guards the path to the final level." },
+            { name: 'T0kenPrince', file: 'assets/@T0kenPrince.jpeg', lore: "Royalty of the token realm. The Prince demands perfection from those who dare challenge him." },
+            { name: 'Uchenna603', file: 'assets/@Uchenna603.jpeg', lore: "A warrior of the digital plains. Uchenna603 fights with patience and precision." }
+        ]
+    },
+    {
+        id: 5,
+        title: "LEVEL 5: THE ASCENSION",
+        levelLore: "The apex of your journey. These legendary artifacts contain the pure, unfiltered essence of ExpatQ3. The time constraint is brutal, the pieces are fragmented, and only the elite will secure their Guaranteed Mint spot. Do you have what it takes to ascend?",
+        gridSize: 4,
+        timeLimit: 120,
+        unlocked: false,
+        arts: [
+            { name: 'AVolcans', file: 'assets/@AVolcans.jpg', lore: "Erupting with creative force, AVolcans reshapes the landscape of digital art." },
+            { name: 'Calopo', file: 'assets/@Calopo_.jpeg', lore: "A master of color and chaos, Calopo's work demands absolute focus to reconstruct." },
+            { name: 'MynddNFT', file: 'assets/@MynddNFT.png', lore: "Mind over matter. MynddNFT's art challenges the very perception of digital reality." },
+            { name: 'Pauline Fathima', file: 'assets/@Pauline_Fathima.jpg', lore: "Grace and power in every stroke. The final guardian before ascension." },
+            { name: 'Yizzz_web3', file: 'assets/@Yizzz_web3.jpg', lore: "The web3 native. Born in the blockchain, destined to guard its most precious art." },
+            { name: 'bitartixt', file: 'assets/@bitartixt.jpeg', lore: "Where bits become art. The ultimate fusion of technology and creativity." },
+            { name: 'dejiiszn', file: 'assets/@dejiiszn.png', lore: "Season after season, dejiiszn delivers masterpieces that defy reconstruction." },
+            { name: 'mr_wayne_2', file: 'assets/@mr_wayne_2.jpeg', lore: "The dark knight of the puzzle grid. Solve his riddle or be forever lost." },
+            { name: 'ccshark64', file: 'assets/@ccshark64.webp', lore: "A predator of the digital deep. ccshark64 circles the leaderboard waiting for the worthy." }
         ]
     }
 ];
@@ -293,13 +312,15 @@ function buildMap() {
     svg.setAttribute("preserveAspectRatio", "none");
     
     const positions = [
-        { x: 20, y: 80 },
-        { x: 80, y: 50 },
-        { x: 50, y: 20 }
+        { x: 15, y: 85 },
+        { x: 45, y: 70 },
+        { x: 80, y: 55 },
+        { x: 55, y: 35 },
+        { x: 35, y: 15 }
     ];
     
     const path = document.createElementNS(svgNS, "path");
-    const d = `M ${positions[0].x} ${positions[0].y} C 50 80, 30 50, ${positions[1].x} ${positions[1].y} C 100 50, 80 20, ${positions[2].x} ${positions[2].y}`;
+    const d = `M ${positions[0].x} ${positions[0].y} C 30 80, 35 75, ${positions[1].x} ${positions[1].y} C 60 65, 70 60, ${positions[2].x} ${positions[2].y} C 75 45, 65 40, ${positions[3].x} ${positions[3].y} C 50 30, 40 20, ${positions[4].x} ${positions[4].y}`;
     path.setAttribute("d", d);
     svg.appendChild(path);
     container.appendChild(svg);
@@ -447,20 +468,19 @@ function selectArt(file, name, el, lore) {
 // ──────────────────────────────────────────────────────
 //  Auth & Leaderboard Handlers
 // ──────────────────────────────────────────────────────
-const authBtn = document.getElementById('auth-x-btn');
-if (authBtn) {
-    authBtn.addEventListener('click', async () => {
-        if (!supabaseClient) return alert("Supabase not initialized");
-        if (currentUser) {
-            // Log out
-            await supabaseClient.auth.signOut();
-            currentUser = null;
-            updateAuthUI();
+// X handle input logic (on intro screen)
+const handleInput = document.getElementById('x-handle-input');
+const startBtn = $('start-btn');
+if (handleInput) {
+    startBtn.style.display = 'none';
+    handleInput.addEventListener('input', () => {
+        const val = handleInput.value.trim().replace('@', '');
+        if (val.length >= 2) {
+            startBtn.style.display = '';
+            playerHandle = val;
         } else {
-            // Log in with X
-            await supabaseClient.auth.signInWithOAuth({
-                provider: 'twitter',
-            });
+            startBtn.style.display = 'none';
+            playerHandle = '';
         }
     });
 }
@@ -751,8 +771,8 @@ function endGame(win) {
         }
         
         // Push Score to Leaderboard
-        if (currentUser && supabaseClient) {
-            const handle = currentUser.user_metadata?.user_name || currentUser.user_metadata?.preferred_username || "Authenticated";
+        if (playerHandle && supabaseClient) {
+            const handle = playerHandle;
             supabaseClient.from('leaderboard').upsert({
                 username: handle,
                 level_reached: currentLevelData.id,
