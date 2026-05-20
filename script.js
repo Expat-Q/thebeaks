@@ -540,6 +540,10 @@ dom.launchBtn.onclick = () => {
 };
 
 $('replay-btn').onclick = () => showScreen('setup');
+$('home-btn').onclick = () => {
+    buildMap(); // Refresh map states
+    showScreen('map');
+};
 
 // ──────────────────────────────────────────────────────
 //  Phase 4: Puzzle Engine
