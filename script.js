@@ -522,6 +522,7 @@ async function fetchLeaderboard() {
             <div class="lb-time">${m}:${s}</div>
         `;
         list.appendChild(item);
+    });
     } catch (error) {
         console.error("Leaderboard error:", error);
         list.innerHTML = `<div style="text-align: center; color: red; padding: 2rem;">Error fetching ranks.</div>`;
