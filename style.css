@@ -1097,6 +1097,24 @@ button { cursor:pointer; font-family:inherit; }
     .setup-inner { padding: 1.2rem 1rem 1.5rem; }
     .setup-layout { grid-template-columns: 1fr; gap: 1rem; }
 
+    /* Map Screen Mobile Fixes */
+    .map-header-row {
+        flex-direction: column;
+        gap: 1rem;
+        padding-top: 3.5rem;
+    }
+    .map-leaderboard-btn {
+        position: static;
+        width: auto;
+    }
+    .map-title {
+        font-size: 1.8rem;
+    }
+    .map-node-label {
+        font-size: 0.65rem;
+        bottom: -22px;
+    }
+
     /* Mobile: hide sidebar by default, show when .mobile-active */
     .panel-sidebar {
         display: none;

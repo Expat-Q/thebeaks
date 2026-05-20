@@ -199,9 +199,13 @@ function playFlipSound() {
 // ──────────────────────────────────────────────────────
 function showScreen(key) {
     Object.values(SCREENS).forEach(s => s.classList.add('hidden'));
-    SCREENS[key].classList.remove('hidden');
-    // scroll to top for scrollable screens
-    SCREENS[key].scrollTop = 0;
+    if (SCREENS[key]) {
+        SCREENS[key].classList.remove('hidden');
+        SCREENS[key].scrollTop = 0;
+    }
+    // Hide sidebar on transition
+    const sidebar = document.querySelector('.panel-sidebar');
+    if (sidebar) sidebar.classList.remove('mobile-active');
 }
 
 // ──────────────────────────────────────────────────────
@@ -449,8 +453,8 @@ function selectArt(file, name, el, lore) {
     dom.gameArtistName.textContent = name;
     dom.launchBtn.disabled   = false;
 
-    // On mobile, show the sidebar as a full-screen preview page
-    if (isMobile()) {
+    // On mobile, show the sidebar as a full-screen preview page only if a specific art is selected
+    if (isMobile() && file) {
         const sidebar = document.querySelector('.panel-sidebar');
         sidebar.classList.add('mobile-active');
     }
