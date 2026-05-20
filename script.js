@@ -6,18 +6,9 @@
 'use strict';
 
 // ──────────────────────────────────────────────────────
-//  Supabase & Auth State
+//  Auth State
 // ──────────────────────────────────────────────────────
-const SUPABASE_URL = 'https://zxpqltyjojxtltxoqlhg.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4cHFsdHlqb2p4dGx0eG9xbGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxNzMzODcsImV4cCI6MjA5NDc0OTM4N30.k_fWjuWXag0Poq1TVP4TNMBRAu1rBWhVZL2c1BQeBMA';
-
-// Initialize Supabase Client (for leaderboard only — no auth)
-const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 let playerHandle = ''; // Manually entered X handle
-
-function updateAuthUI() {
-    // No longer needed — using manual handle input
-}
 
 // ──────────────────────────────────────────────────────
 //  State
@@ -503,31 +494,19 @@ if (closeLbBtn && lbModal) {
 
 async function fetchLeaderboard() {
     const list = document.getElementById('leaderboard-list');
-    if (!supabaseClient) {
-        list.innerHTML = `<div style="text-align: center; color: var(--muted); padding: 2rem;">Backend not connected.</div>`;
-        return;
-    }
     
     list.innerHTML = `<div style="text-align: center; color: var(--gold); padding: 2rem;">Loading the masters...</div>`;
     
-    // Fetch top 50 scores, sorted by level desc, total_time asc
-    const { data, error } = await supabaseClient
-        .from('leaderboard')
-        .select('*')
-        .order('level_reached', { ascending: false })
-        .order('total_time', { ascending: true })
-        .limit(50);
+    try {
+        const response = await fetch('/api/leaderboard');
+        if (!response.ok) throw new Error('Failed to fetch leaderboard');
         
-    if (error) {
-        console.error("Leaderboard error:", error);
-        list.innerHTML = `<div style="text-align: center; color: red; padding: 2rem;">Error fetching ranks.</div>`;
-        return;
-    }
-    
-    if (!data || data.length === 0) {
-        list.innerHTML = `<div style="text-align: center; color: var(--muted); padding: 2rem;">No champions yet. Be the first!</div>`;
-        return;
-    }
+        const data = await response.json();
+        
+        if (!data || data.length === 0) {
+            list.innerHTML = `<div style="text-align: center; color: var(--muted); padding: 2rem;">No champions yet. Be the first!</div>`;
+            return;
+        }
     
     list.innerHTML = '';
     data.forEach((row, index) => {
@@ -543,7 +522,10 @@ async function fetchLeaderboard() {
             <div class="lb-time">${m}:${s}</div>
         `;
         list.appendChild(item);
-    });
+    } catch (error) {
+        console.error("Leaderboard error:", error);
+        list.innerHTML = `<div style="text-align: center; color: red; padding: 2rem;">Error fetching ranks.</div>`;
+    }
 }
 
 // No custom image upload or difficulty selection in GTD mode
@@ -771,16 +753,23 @@ function endGame(win) {
         }
         
         // Push Score to Leaderboard
-        if (playerHandle && supabaseClient) {
+        if (playerHandle) {
             const handle = playerHandle;
-            supabaseClient.from('leaderboard').upsert({
-                username: handle,
-                level_reached: currentLevelData.id,
-                total_time: elapsed
-            }, { onConflict: 'username' })
-            .then(({ error }) => {
-                if (error) console.error("Error saving score:", error);
-                else console.log("Score saved to GTD Leaderboard!");
+            fetch('/api/leaderboard', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: handle,
+                    level_reached: currentLevelData.id,
+                    total_time: elapsed
+                })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to save score');
+                console.log("Score saved to GTD Leaderboard!");
+            })
+            .catch(error => {
+                console.error("Error saving score:", error);
             });
         }
         
