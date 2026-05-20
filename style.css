@@ -496,6 +496,7 @@ button { cursor:pointer; font-family:inherit; }
 /* Map Nodes */
 .map-node {
     position: absolute;
+    z-index: 5;
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -511,10 +512,15 @@ button { cursor:pointer; font-family:inherit; }
     transition: var(--trans);
     transform: translate(-50%, -50%);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    overflow: visible;
+    padding: 0;
+    outline: none;
+    font-family: inherit;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
-.map-node::after {
-    content: '';
+.map-node-label {
     position: absolute;
     bottom: -30px;
     font-size: 0.8rem;
@@ -523,9 +529,11 @@ button { cursor:pointer; font-family:inherit; }
     text-transform: uppercase;
     letter-spacing: 0.1em;
     font-family: 'Playfair Display', serif;
+    text-shadow: 0 0 5px #000;
+    pointer-events: none;
 }
 
-.map-node:hover:not(.locked) {
+.map-node:hover:not(.locked):not(:disabled) {
     transform: translate(-50%, -50%) scale(1.1);
     border-color: var(--gold);
     box-shadow: 0 0 30px rgba(232, 193, 106, 0.4);
@@ -546,7 +554,8 @@ button { cursor:pointer; font-family:inherit; }
     100% { box-shadow: 0 0 0 0 rgba(232, 193, 106, 0); }
 }
 
-.map-node.locked {
+.map-node.locked,
+.map-node:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     background: rgba(30, 30, 30, 0.8);

@@ -247,22 +247,22 @@
             </div>
         </div>
 
-        <!-- Level Lore Modal -->
-        <div id="level-lore-modal" class="overlay-screen hidden" style="z-index: 900; background: rgba(0,0,0,0.85);">
-            <div class="overlay-content" style="max-width: 600px; width: 90%;">
-                <h1 id="lore-modal-title" style="color: var(--gold); font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 1rem;">LEVEL X</h1>
-                <p id="lore-modal-text" style="color: var(--muted); font-size: 1.1rem; line-height: 1.8; margin-bottom: 2rem;"></p>
-                <div class="overlay-actions">
-                    <button id="proceed-to-gallery-btn" class="btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1rem;">ENTER GALLERY</button>
-                </div>
-            </div>
-        </div>
-
         <!-- Hidden canvas for generating share card -->
         <canvas id="share-canvas" style="display:none;"></canvas>
     </div>
 
-    <script src="script.js?v=2"></script>
+    <!-- Level Lore Modal (must be outside #message so it's not hidden when other screens are active) -->
+    <div id="level-lore-modal" class="overlay-screen hidden" style="z-index: 900; background: rgba(0,0,0,0.85);">
+        <div class="overlay-content" style="max-width: 600px; width: 90%;">
+            <h1 id="lore-modal-title" style="color: var(--gold); font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 1rem;">LEVEL X</h1>
+            <p id="lore-modal-text" style="color: var(--muted); font-size: 1.1rem; line-height: 1.8; margin-bottom: 2rem;"></p>
+            <div class="overlay-actions">
+                <button id="proceed-to-gallery-btn" class="btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1rem;">ENTER GALLERY</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js?v=3"></script>
 </body>
 
 </html>

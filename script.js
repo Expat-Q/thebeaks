@@ -292,76 +292,84 @@ function buildMap() {
     svg.setAttribute("viewBox", "0 0 100 100");
     svg.setAttribute("preserveAspectRatio", "none");
     
-    // Coordinates for the 3 levels (percentage based for responsiveness)
-    // Pathway goes from bottom-left, to middle-right, to top-center
     const positions = [
-        { x: 20, y: 80 }, // Level 1: Bottom Left
-        { x: 80, y: 50 }, // Level 2: Middle Right
-        { x: 50, y: 20 }  // Level 3: Top Center
+        { x: 20, y: 80 },
+        { x: 80, y: 50 },
+        { x: 50, y: 20 }
     ];
     
-    // Create the curved path
     const path = document.createElementNS(svgNS, "path");
-    // Draw bezier curves between the nodes using 0-100 viewBox coordinates
-    const d = `M ${positions[0].x} ${positions[0].y} 
-               C 50 80, 30 50, ${positions[1].x} ${positions[1].y} 
-               C 100 50, 80 20, ${positions[2].x} ${positions[2].y}`;
+    const d = `M ${positions[0].x} ${positions[0].y} C 50 80, 30 50, ${positions[1].x} ${positions[1].y} C 100 50, 80 20, ${positions[2].x} ${positions[2].y}`;
     path.setAttribute("d", d);
     svg.appendChild(path);
     container.appendChild(svg);
     
     // Create Nodes
     LEVELS.forEach((lvl, index) => {
-        const node = document.createElement('div');
+        const node = document.createElement('button');
         node.className = 'map-node';
+        node.setAttribute('data-level-id', lvl.id);
+        node.type = 'button';
+        
         if (lvl.unlocked) {
             node.classList.add('unlocked');
-            // If it's the highest unlocked level, make it glow
             const isHighestUnlocked = (index === LEVELS.length - 1) || !LEVELS[index + 1].unlocked;
             if (isHighestUnlocked) node.classList.add('active-glow');
+            node.textContent = lvl.id;
         } else {
             node.classList.add('locked');
-            node.innerHTML = '🔒';
+            node.textContent = '🔒';
+            node.disabled = true;
         }
         
         node.style.left = positions[index].x + '%';
         node.style.top = positions[index].y + '%';
         
-        if (lvl.unlocked) node.textContent = lvl.id;
-        
-        // Label for the node
-        const label = document.createElement('div');
+        // Label below node
+        const label = document.createElement('span');
+        label.className = 'map-node-label';
         label.textContent = lvl.title;
-        label.style.position = 'absolute';
-        label.style.bottom = '-30px';
-        label.style.fontSize = '0.8rem';
-        label.style.color = 'var(--gold)';
-        label.style.whiteSpace = 'nowrap';
-        label.style.fontFamily = "'Playfair Display', serif";
-        label.style.textShadow = '0 0 5px #000';
         node.appendChild(label);
-        
-        node.onclick = () => {
-            if (lvl.unlocked) {
-                currentLevelData = lvl;
-                showLevelLore(lvl);
-            }
-        };
         
         container.appendChild(node);
     });
+    
+    // Event delegation on the container
+    container.onclick = function(e) {
+        const node = e.target.closest('.map-node');
+        if (!node) return;
+        const levelId = parseInt(node.getAttribute('data-level-id'));
+        const lvl = LEVELS.find(l => l.id === levelId);
+        if (!lvl || !lvl.unlocked) return;
+        
+        console.log('Level clicked:', lvl.title);
+        currentLevelData = lvl;
+        showLevelLore(lvl);
+    };
 }
 
 function showLevelLore(lvl) {
     const modal = $('level-lore-modal');
-    if (!modal) return;
+    if (!modal) {
+        console.error('level-lore-modal not found, proceeding directly to gallery');
+        buildGallery();
+        showScreen('setup');
+        return;
+    }
     $('lore-modal-title').textContent = lvl.title;
     $('lore-modal-text').textContent = lvl.levelLore;
+    modal.style.display = 'flex';
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'auto';
     modal.classList.remove('hidden');
 }
 
 $('proceed-to-gallery-btn').onclick = () => {
-    $('level-lore-modal').classList.add('hidden');
+    const modal = $('level-lore-modal');
+    modal.classList.add('hidden');
+    modal.style.display = '';
+    modal.style.opacity = '';
+    modal.style.pointerEvents = '';
     buildGallery();
     showScreen('setup');
 };
