@@ -465,16 +465,20 @@ function selectArt(file, name, el, lore) {
     selectedImg    = file;
     selectedArtist = name;
 
-    dom.previewImg.src = file;
-    dom.previewImg.classList.remove('hidden');
-    dom.previewPlaceholder.style.display = 'none';
-    dom.artistNameVal.textContent = name;
-    dom.artistDisplay.classList.remove('hidden');
     dom.selectionStatus.textContent = 'Art staged for authentication ✓';
 
-    dom.targetPreview.src    = file;
-    dom.gameArtistName.textContent = name;
-    dom.launchBtn.disabled   = false;
+    if (file) {
+        dom.previewImg.src = file;
+        dom.previewImg.classList.remove('hidden');
+        dom.targetPreview.src = file;
+    } else {
+        dom.previewImg.src = '';
+        dom.previewImg.classList.add('hidden');
+        dom.targetPreview.src = '';
+    }
+
+    dom.gameArtistName.textContent = name || '';
+    dom.launchBtn.disabled = !file;
 
     // On mobile, show the sidebar as a full-screen preview page only if a specific art is selected
     if (isMobile() && file) {
