@@ -1,5 +1,3 @@
-const { MongoClient } = require('mongodb');
-
 let cachedClient = null;
 let cachedDb = null;
 
@@ -10,10 +8,11 @@ async function connectToDatabase() {
 
     const uri = process.env.MONGODB_URI;
     if (!uri) {
-        throw new Error('MONGODB_URI is not defined in environment variables. Please check Vercel settings.');
+        throw new Error('MONGODB_URI is not defined in environment variables.');
     }
 
-    const client = new MongoClient(uri);
+    const { MongoClient } = require('mongodb');
+    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     await client.connect();
     const db = client.db('beaks-puzzle-game');
 
@@ -38,43 +37,32 @@ module.exports = async function handler(req, res) {
             }
 
             if (username) {
-                // Fetch progress for a specific user
-                try {
-                    const userDoc = await collection.findOne({ username: new RegExp('^' + username + '$', 'i') });
-                    if (userDoc) {
-                        return res.status(200).json(userDoc);
-                    } else {
-                        return res.status(200).json({ level_reached: 1, total_time: 0 }); // Default state
-                    }
-                } catch (e) {
-                    console.error("FindOne Error:", e);
-                    return res.status(500).json({ error: e.toString() });
+                const userDoc = await collection.findOne({ username: new RegExp('^' + username + '$', 'i') });
+                if (userDoc) {
+                    return res.status(200).json(userDoc);
+                } else {
+                    return res.status(200).json({ level_reached: 1, total_time: 0 });
                 }
             } else {
-                // Fetch top 50 scores
                 const scores = await collection
                     .find({})
                     .sort({ level_reached: -1, total_time: 1 })
                     .limit(50)
                     .toArray();
-
                 return res.status(200).json(scores);
             }
 
         } else if (req.method === 'POST') {
-            // Upsert user score
             const { username, level_reached, total_time } = req.body;
 
             if (!username || typeof level_reached !== 'number' || typeof total_time !== 'number') {
                 return res.status(400).json({ error: 'Invalid input data' });
             }
 
-            // Check if user already exists (case-insensitive)
             const regexUsername = new RegExp('^' + username + '$', 'i');
             const existingUser = await collection.findOne({ username: regexUsername });
 
             if (existingUser) {
-                // Update only if they reached a higher level, OR if they are on the same level with a faster time
                 if (
                     level_reached > existingUser.level_reached ||
                     (level_reached === existingUser.level_reached && total_time < existingUser.total_time)
@@ -88,7 +76,6 @@ module.exports = async function handler(req, res) {
                     return res.status(200).json({ message: 'Score not updated (previous score was better)' });
                 }
             } else {
-                // Insert new user score
                 await collection.insertOne({
                     username,
                     level_reached,
@@ -103,7 +90,7 @@ module.exports = async function handler(req, res) {
             return res.status(405).end(`Method ${req.method} Not Allowed`);
         }
     } catch (error) {
-        console.error('Database Error:', error);
-        return res.status(500).json({ error: error.message || error.toString() });
+        console.error('Handler Error:', error);
+        return res.status(500).json({ error: error.message || error.toString(), code: error.code });
     }
 };

@@ -1,7 +1,19 @@
 module.exports = (req, res) => {
-    res.status(200).json({ 
-        status: 'OK', 
-        message: 'Function is running!',
-        env_has_mongo: !!process.env.MONGODB_URI
-    });
+    try {
+        const { MongoClient } = require('mongodb');
+        const pkg = require('mongodb/package.json');
+        res.status(200).json({ 
+            success: true, 
+            mongoLoaded: true, 
+            version: pkg.version,
+            nodeVersion: process.version
+        });
+    } catch (e) {
+        res.status(200).json({ 
+            success: false, 
+            error: e.message,
+            code: e.code,
+            nodeVersion: process.version
+        });
+    }
 };
