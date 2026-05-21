@@ -607,6 +607,7 @@ button { cursor:pointer; font-family:inherit; }
     padding: 0.6rem 1rem;
     transition: var(--trans);
     max-width: 300px;
+    margin: 0 auto;
 }
 
 .x-handle-input-group:focus-within {
@@ -674,6 +675,15 @@ button { cursor:pointer; font-family:inherit; }
     font-weight: 800;
     color: var(--gold);
     width: 30px;
+}
+
+.leaderboard-item .lb-pfp {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .leaderboard-item .lb-user {

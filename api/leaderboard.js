@@ -17,14 +17,26 @@ export default async function handler(req, res) {
         const collection = db.collection('leaderboard');
 
         if (req.method === 'GET') {
-            // Fetch top 50 scores
-            const scores = await collection
-                .find({})
-                .sort({ level_reached: -1, total_time: 1 })
-                .limit(50)
-                .toArray();
+            const { username } = req.query;
 
-            return res.status(200).json(scores);
+            if (username) {
+                // Fetch progress for a specific user
+                const userDoc = await collection.findOne({ username });
+                if (userDoc) {
+                    return res.status(200).json(userDoc);
+                } else {
+                    return res.status(200).json({ level_reached: 1, total_time: 0 }); // Default state
+                }
+            } else {
+                // Fetch top 50 scores
+                const scores = await collection
+                    .find({})
+                    .sort({ level_reached: -1, total_time: 1 })
+                    .limit(50)
+                    .toArray();
+
+                return res.status(200).json(scores);
+            }
 
         } else if (req.method === 'POST') {
             // Upsert user score

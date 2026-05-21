@@ -266,7 +266,30 @@ dom.introVideo.muted = false;
 // ──────────────────────────────────────────────────────
 //  Phase 2: Landing & Navigation
 // ──────────────────────────────────────────────────────
-$('start-btn').onclick = () => {
+$('start-btn').onclick = async () => {
+    const btn = $('start-btn');
+    btn.textContent = 'SYNCING...';
+    btn.disabled = true;
+
+    try {
+        if (playerHandle) {
+            const res = await fetch(`/api/leaderboard?username=${encodeURIComponent(playerHandle)}`);
+            if (res.ok) {
+                const data = await res.json();
+                const levelReached = data.level_reached || 1;
+                // Unlock levels based on synced progress
+                LEVELS.forEach(l => {
+                    if (l.id <= levelReached) l.unlocked = true;
+                });
+            }
+        }
+    } catch (e) {
+        console.error("Sync error:", e);
+    }
+
+    btn.textContent = 'ENTER ART STUDIO';
+    btn.disabled = false;
+    
     buildMap();
     showScreen('map');
 };
@@ -520,9 +543,15 @@ async function fetchLeaderboard() {
         const m = Math.floor(row.total_time / 60).toString().padStart(2, '0');
         const s = (row.total_time % 60).toString().padStart(2, '0');
         
+        const pfpUrl = `https://unavatar.io/twitter/${encodeURIComponent(row.username)}?fallback=https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png`;
+
         item.innerHTML = `
             <div class="lb-rank">#${index + 1}</div>
-            <div class="lb-user">@${row.username} <span class="lb-level">LVL ${row.level_reached}</span></div>
+            <img src="${pfpUrl}" class="lb-pfp" alt="@${row.username}">
+            <div class="lb-user">
+                @${row.username}
+                <div class="lb-level">LVL ${row.level_reached}</div>
+            </div>
             <div class="lb-time">${m}:${s}</div>
         `;
         list.appendChild(item);
@@ -952,7 +981,7 @@ function showToast(msg) {
 // ──────────────────────────────────────────────────────
 //  Controls
 // ──────────────────────────────────────────────────────
-$('shuffle-btn').onclick = () => { shuffleBoard(); startTimer(); };
+$('shuffle-btn').onclick = () => { shuffleBoard(); };
 
 // Number toggle
 dom.toggleNumBtn.addEventListener('click', () => {
