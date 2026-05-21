@@ -1,4 +1,5 @@
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
+import url from 'url';
 
 let cachedClient = null;
 let cachedDb = null;
@@ -32,7 +33,6 @@ export default async function handler(req, res) {
             if (req.query && req.query.username) {
                 username = req.query.username;
             } else if (req.url) {
-                const url = require('url');
                 const queryObject = url.parse(req.url, true).query;
                 username = queryObject.username;
             }
