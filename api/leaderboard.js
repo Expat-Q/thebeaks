@@ -1,14 +1,25 @@
 const { MongoClient } = require('mongodb');
 
-// Connection URI and Database Name
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
+let cachedClient = null;
+let cachedDb = null;
 
 async function connectToDatabase() {
-    if (!client.topology || !client.topology.isConnected()) {
-        await client.connect();
+    if (cachedClient && cachedDb) {
+        return cachedDb;
     }
-    return client.db('beaks-puzzle-game');
+
+    const uri = process.env.MONGODB_URI;
+    if (!uri) {
+        throw new Error('MONGODB_URI is not defined in environment variables. Please check Vercel settings.');
+    }
+
+    const client = new MongoClient(uri);
+    await client.connect();
+    const db = client.db('beaks-puzzle-game');
+
+    cachedClient = client;
+    cachedDb = db;
+    return db;
 }
 
 export default async function handler(req, res) {
