@@ -51,7 +51,7 @@ const LEVELS = [
         levelLore: "Having mastered the basics, you enter the treacherous midlands. The flock has scattered, their forms becoming more complex and abstract. Time moves differently here. Only those with true vision can navigate the visual static to find the hidden patterns.",
         gridSize: 3,
         timeLimit: 150,
-        unlocked: false,
+        unlocked: true,
         arts: [
             { name: 'ANYA MISAAKI', file: 'assets/ANYA MISAAKI.jpg', lore: "A silent watcher from the digital canopy, preserving the ancient secrets of the ExpatQ3 realm." },
             { name: 'AURORA', file: 'assets/AURORA.jpg', lore: "Born under the neon lights of the metaverse, Aurora guides lost players through the grid." },
@@ -69,7 +69,7 @@ const LEVELS = [
         levelLore: "The grid expands. What was once a 3x3 challenge becomes a 4x4 labyrinth of fragmented art. The Trial separates the casual players from the true believers. Your pattern recognition must evolve or you will be consumed by the complexity.",
         gridSize: 4,
         timeLimit: 180,
-        unlocked: false,
+        unlocked: true,
         arts: [
             { name: 'DR TIM', file: 'assets/DR TIM.jpg', lore: "The mad scientist of the flock. DR TIM experiments with on-chain mechanics that defy logic." },
             { name: 'IAMJAY', file: 'assets/IAMJAY.jpg', lore: "A master of stealth and strategy. When IAMJAY appears, the meta is about to shift." },
@@ -87,7 +87,7 @@ const LEVELS = [
         levelLore: "The crucible burns away the unworthy. Time is your enemy now — 150 seconds to reconstruct masterpieces fragmented into 16 pieces. Every second wasted is a step closer to failure. Only the sharpest minds survive the crucible.",
         gridSize: 4,
         timeLimit: 150,
-        unlocked: false,
+        unlocked: true,
         arts: [
             { name: 'VICTORX', file: 'assets/VICTORX.jpg', lore: "Victory is not an option, it is a state of being. The apex predator of the puzzle grid." },
             { name: 'collcool_sneh', file: 'assets/collcool_sneh.jpg', lore: "Cool under pressure. Can you beat the clock before the colors fade into the blockchain?" },
@@ -105,7 +105,7 @@ const LEVELS = [
         levelLore: "The apex of your journey. These legendary artifacts contain the pure, unfiltered essence of ExpatQ3. The time constraint is brutal, the pieces are fragmented, and only the elite will secure their Guaranteed Mint spot. Do you have what it takes to ascend?",
         gridSize: 4,
         timeLimit: 120,
-        unlocked: false,
+        unlocked: true,
         arts: [
             { name: 'AVolcans', file: 'assets/@AVolcans.jpg', lore: "Erupting with creative force, AVolcans reshapes the landscape of digital art." },
             { name: 'Calopo', file: 'assets/@Calopo_.jpeg', lore: "A master of color and chaos, Calopo's work demands absolute focus to reconstruct." },
