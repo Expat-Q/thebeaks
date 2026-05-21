@@ -1,5 +1,4 @@
-import { MongoClient } from 'mongodb';
-import url from 'url';
+const { MongoClient } = require('mongodb');
 
 let cachedClient = null;
 let cachedDb = null;
@@ -23,7 +22,7 @@ async function connectToDatabase() {
     return db;
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     try {
         const db = await connectToDatabase();
         const collection = db.collection('leaderboard');
@@ -33,6 +32,7 @@ export default async function handler(req, res) {
             if (req.query && req.query.username) {
                 username = req.query.username;
             } else if (req.url) {
+                const url = require('url');
                 const queryObject = url.parse(req.url, true).query;
                 username = queryObject.username;
             }
@@ -106,4 +106,4 @@ export default async function handler(req, res) {
         console.error('Database Error:', error);
         return res.status(500).json({ error: error.message || error.toString() });
     }
-}
+};
