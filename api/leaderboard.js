@@ -17,15 +17,27 @@ export default async function handler(req, res) {
         const collection = db.collection('leaderboard');
 
         if (req.method === 'GET') {
-            const { username } = req.query;
+            let username = null;
+            if (req.query && req.query.username) {
+                username = req.query.username;
+            } else if (req.url) {
+                const url = require('url');
+                const queryObject = url.parse(req.url, true).query;
+                username = queryObject.username;
+            }
 
             if (username) {
                 // Fetch progress for a specific user
-                const userDoc = await collection.findOne({ username });
-                if (userDoc) {
-                    return res.status(200).json(userDoc);
-                } else {
-                    return res.status(200).json({ level_reached: 1, total_time: 0 }); // Default state
+                try {
+                    const userDoc = await collection.findOne({ username: new RegExp('^' + username + '$', 'i') });
+                    if (userDoc) {
+                        return res.status(200).json(userDoc);
+                    } else {
+                        return res.status(200).json({ level_reached: 1, total_time: 0 }); // Default state
+                    }
+                } catch (e) {
+                    console.error("FindOne Error:", e);
+                    return res.status(500).json({ error: e.toString() });
                 }
             } else {
                 // Fetch top 50 scores
