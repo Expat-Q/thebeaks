@@ -69,8 +69,9 @@ export default async function handler(req, res) {
                 return res.status(400).json({ error: 'Invalid input data' });
             }
 
-            // Check if user already exists
-            const existingUser = await collection.findOne({ username });
+            // Check if user already exists (case-insensitive)
+            const regexUsername = new RegExp('^' + username + '$', 'i');
+            const existingUser = await collection.findOne({ username: regexUsername });
 
             if (existingUser) {
                 // Update only if they reached a higher level, OR if they are on the same level with a faster time
@@ -79,7 +80,7 @@ export default async function handler(req, res) {
                     (level_reached === existingUser.level_reached && total_time < existingUser.total_time)
                 ) {
                     await collection.updateOne(
-                        { username },
+                        { username: regexUsername },
                         { $set: { level_reached, total_time, updated_at: new Date() } }
                     );
                     return res.status(200).json({ message: 'Score updated successfully' });

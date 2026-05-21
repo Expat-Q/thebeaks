@@ -992,6 +992,20 @@ function showToast(msg) {
 // ──────────────────────────────────────────────────────
 $('shuffle-btn').onclick = () => { shuffleBoard(); };
 
+$('ai-help-btn').onclick = () => {
+    // Instantly sort the tiles to their original positions
+    tiles.forEach(t => {
+        t.currentIndex = t.originalIndex;
+    });
+    emptyTileIndex = 15;
+    renderBoard();
+    
+    // Slight delay to let the board render before checking win
+    setTimeout(() => {
+        checkWin();
+    }, 100);
+};
+
 // Number toggle
 dom.toggleNumBtn.addEventListener('click', () => {
     showNumbers = !showNumbers;
