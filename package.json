@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "An interactive NFT sliding puzzle game.",
   "main": "script.js",
+  "type": "commonjs",
   "scripts": {
     "start": "npx -y serve .",
     "build": "echo 'Building static site'"
@@ -16,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^17.4.2",
     "mongodb": "^7.2.0"
   }
 }

@@ -1,4 +1,10 @@
 {
   "buildCommand": "echo 'Static Site'",
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "functions": {
+    "api/leaderboard.js": {
+      "memory": 128,
+      "maxDuration": 10
+    }
+  }
 }
