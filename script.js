@@ -213,17 +213,20 @@ function showScreen(key) {
 // ──────────────────────────────────────────────────────
 const FLIP_PAGES = document.querySelectorAll('.flip-page');
 
+let bookFlipInterval;
+let bookFlipTimeout;
+
 function startBookFlip() {
     let idx = 0;
     // flip each page at 550ms — slightly slower as requested
-    const interval = setInterval(() => {
+    bookFlipInterval = setInterval(() => {
         if (idx < FLIP_PAGES.length) {
             // Sound removed per user request
             FLIP_PAGES[idx].classList.add('flipped');
             idx++;
         } else {
-            clearInterval(interval);
-            setTimeout(goToVideo, 800);
+            clearInterval(bookFlipInterval);
+            bookFlipTimeout = setTimeout(goToVideo, 800);
         }
     }, 550);
 }
@@ -242,6 +245,8 @@ if (tapStart) {
 
 $('skip-flip-btn').onclick = () => {
     if (tapStart && tapStart.parentNode) tapStart.remove();
+    if (bookFlipInterval) clearInterval(bookFlipInterval);
+    if (bookFlipTimeout) clearTimeout(bookFlipTimeout);
     goToVideo();
 };
 
