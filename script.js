@@ -286,6 +286,9 @@ $('start-btn').onclick = async () => {
                 LEVELS.forEach(l => {
                     if (l.id <= levelReached) l.unlocked = true;
                 });
+            } else {
+                const errData = await res.json().catch(() => ({}));
+                console.error("Backend Sync Error:", errData.error || res.statusText);
             }
         }
     } catch (e) {
@@ -811,12 +814,15 @@ function endGame(win) {
                     total_time: elapsed
                 })
             })
-            .then(res => {
-                if (!res.ok) throw new Error('Failed to save score');
+            .then(async res => {
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData.error || 'Failed to save score');
+                }
                 console.log("Score saved to GTD Leaderboard!");
             })
             .catch(error => {
-                console.error("Error saving score:", error);
+                console.error("Backend Error:", error.message);
             });
         }
         
